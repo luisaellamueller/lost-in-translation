@@ -140,6 +140,7 @@ def compare_complexity(
     project_dir: Path,
     input_name: str = "complexity_translations.json",
     output_name: str = "complexity_multimeasure_pilot.json",
+    completed_cases_only: bool = False,
 ) -> None:
     """Compare the fixed linguistic measures for complete translation pairs.
 
@@ -147,17 +148,20 @@ def compare_complexity(
         project_dir: Project directory containing the completed translations.
         input_name: Translation JSON filename in data/processed.
         output_name: Measurement JSON filename in data/processed.
+        completed_cases_only: Explicitly exclude and report flagged generation failures.
     """
     # Load the fixed pilot and German parsing pipeline
     data_dir = project_dir / "data/processed"
     source = json.loads((data_dir / input_name).read_text(encoding="utf-8"))
-    if source.get("failed_records"):
+    if source.get("failed_records") and not completed_cases_only:
         raise ValueError("Resolve flagged translations before evaluating the full sample.")
     nlp = load_parser([record[field] for record in source["records"] for field in ("reference_de", "translation_de")])
     records = []
 
     # Parse both complete German versions with identical settings
     for record in source["records"]:
+        if record["finish_reason"] != "stop" or not record["translation_de"].strip():
+            raise ValueError(f"Incomplete output in completed records: {record['document_id']}")
         official = measure_text(nlp(record["reference_de"]))
         generated = measure_text(nlp(record["translation_de"]))
         records.append({
@@ -189,6 +193,11 @@ def compare_complexity(
     # Save measurements and sentence boundaries for reproducible inspection
     output = {
         "input_file": input_name,
+        "analysis_population": "Normally stopped outputs only; not necessarily semantically valid translations.",
+        "attempted_count": len(source["records"]) + len(source.get("failed_records", [])),
+        "completed_count": len(source["records"]),
+        "completed_cases_only": completed_cases_only,
+        "excluded_failures": [{"document_id": row["document_id"], "finish_reason": row["finish_reason"]} for row in source.get("failed_records", [])],
         "spacy_version": spacy.__version__,
         "parser": "de_core_news_sm",
         "parser_version": nlp.meta["version"],

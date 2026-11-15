@@ -1,3 +1,5 @@
+> Updated handover: the package now includes `scripts/compare_expanded.py` and its saved preliminary results. Run `python scripts/compare_expanded.py` after installing the analysis requirements. No translation model, API key or new translation run is required. The original 259 normally stopped outputs and one failed attempt remain unchanged. Quality screening is still pending; a normal stop does not establish translation adequacy.
+
 # Handover for Luisa
 
 Snapshot: 15 November 2026. Submission deadline: 20 November 2026.
@@ -40,7 +42,8 @@ French is the designated model input, not a verified original in every case.
    references. All 260 inputs fit the existing 2,048-token input cap.
 8. Finished 260 generation attempts: 259 stopped normally, one hit the output
    limit and showed repetition. Preserved all attempts and kept the failure
-   separate. No expanded paired scores have yet been produced.
+   separate. A completed-case scoring entry point and preliminary results for the
+   259 normally stopped outputs are now included.
 9. Scored 10,581 eligible official German justifications and produced annual
    summaries and a historical chart. Updated the methods log throughout.
 
@@ -143,14 +146,13 @@ translation practices without evidence.
 1. Screen the 259 outputs for repetition and obvious generation problems, without
    selecting cases based on the desired complexity result. Preserve flags and
    exclusion reasons. Inspect representative normal cases too.
-2. Decide and document the failure policy: e.g. a clearly labelled completed-case
-   analysis with the observed failure rate, or a separate systematic retry
-   experiment. Preserve the failed attempt and distinguish retries from the
-   original method. The current comparison guard needs an explicit change or a
-   documented derived input before scoring the 259 completed cases.
+2. Review the documented completed-case failure policy and report the observed
+   failure rate. A separate systematic retry experiment remains an option. Preserve the failed attempt and distinguish retries from the
+   original method. The new `compare_expanded.py` entry point explicitly adopts the completed-case
+   policy and records the failed ID, without modifying the translation input.
 3. Run paired complexity scoring with the fixed definitions. Report available
-   pairs per measure. Add paired document bootstrap uncertainty and period
-   robustness summaries; these are not yet implemented for the expanded sample.
+   pairs per measure. Paired bootstrap uncertainty within year is implemented (2,000 resamples,
+   seed 47). Broader-period robustness summaries remain to be added.
 4. Inspect transparently selected examples (large changes, typical changes,
    counterexamples), checking French and both German versions. Distinguish
    rephrasing, compound unpacking, omissions and pre-existing bilingual mismatch.
@@ -169,6 +171,7 @@ translation practices without evidence.
 | `scripts/prepare_pilot.py` | Supplies `clean_text` to the audit; old pilot entry point is not used |
 | `scripts/prepare_expanded_sample.py` | Rebuild the fixed ten-per-year sample; requires included pilot inputs for excluded IDs |
 | `scripts/translate_pilot.py` | Full-section translation and resumable completed/failed outputs; use explicit filenames |
+| `scripts/compare_expanded.py` | Ready-to-run 259-case comparison, explicit failure accounting, paired uncertainty and Markdown results table |
 | `scripts/compare_complexity.py` | Shared parsing/measures and paired summaries; default is the ten-document pilot |
 | `scripts/score_historical_complexity.py` | Historical scoring, yearly summaries and figure |
 

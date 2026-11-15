@@ -10,8 +10,9 @@ commit. No remote repository has been created or published.
 - Historical analysis: 10,581 official German motion justifications, 2000-2025.
 - Translation sample: 260 pairs, ten per year; 259 completed outputs and one
   preserved failed attempt (20013159). Completion is not a quality guarantee.
-- Main expanded paired comparison: NOT SCORED YET. The comparison script
-  deliberately refuses input containing unresolved `failed_records`.
+- Main expanded paired comparison: a runnable completed-case analysis of 259
+  normally stopped outputs, with one failure explicitly reported. Quality screening
+  remains pending; these are preliminary measurements, not validated translation-quality findings.
 - Existing ten-document development and twenty-document validation results are
   included as preliminary evidence, not results for the expanded sample.
 
@@ -100,11 +101,31 @@ compare_complexity(
 PYCODE
 ```
 
-For the expanded comparison, first document a decision about the failed case
-and finish output-quality checks. Do not delete the failure merely to bypass
-the guard. A clearly labelled analysis of the 259 completed pairs is possible,
-but its failure/exclusion policy must be implemented and reported explicitly.
-There is currently no dedicated command implementing that policy.
+## Run the expanded translation comparison
+
+After installing `requirements.txt`, run from the repository root:
+
+```bash
+python scripts/compare_expanded.py
+```
+
+This checks all 260 attempts against the selected sample, measures the 259 normally
+stopped outputs using the same German parser for both versions, and explicitly
+reports failed document 20013159. It does not modify the original translations or
+retry the failure. Missing measures use complete pairs and report their N.
+
+Outputs (already bundled, so Luisa can inspect them immediately):
+- `data/processed/complexity_expanded_results.json`: document measurements, means,
+  directional counts and paired bootstrap intervals.
+- `docs/expanded_comparison.md`: readable table of all measures and the failure.
+
+Intervals use 2,000 paired-document resamples within submission year (seed 47).
+The analysis is conditional on normal generation completion. It does not correct
+for author dependence, missing failed cases, semantic problems or testing many
+measures. Repetition/output-quality screening remains pending. Do not silently
+exclude additional outputs based on whether they support the desired result.
+The low-level comparison function still rejects failures by default; this entry
+point explicitly requests and labels a completed-case analysis.
 
 ## Optional: run the local translator
 
