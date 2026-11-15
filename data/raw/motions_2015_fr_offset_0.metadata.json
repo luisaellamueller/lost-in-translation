@@ -1,0 +1,4 @@
+{
+  "query_url": "https://ws.parlament.ch/OData.svc/Business?%24filter=BusinessType+eq+5+and+Language+eq+%27FR%27+and+SubmissionDate+ge+datetime%272015-01-01T00%3A00%3A00%27+and+SubmissionDate+lt+datetime%272016-01-01T00%3A00%3A00%27&%24select=ID%2CLanguage%2CBusinessType%2CTitle%2CReasonText%2CSubmissionDate&%24orderby=ID&%24format=json&%24top=500&%24skip=0",
+  "retrieved_at": "2026-11-14T08:32:20.555894+00:00"
+}

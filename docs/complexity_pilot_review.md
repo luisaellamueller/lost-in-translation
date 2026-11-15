@@ -1,0 +1,314 @@
+> Handover status, 15 November 2026: all 260 translation attempts have finished (259 normally stopped outputs, one preserved failed attempt). Expanded paired scoring and output-quality screening remain pending. Older statements about pending generation below describe earlier stages. See [HANDOVER.md](../HANDOVER.md) for the current task list.
+
+# Active project argument: linguistic complexity
+
+Updated 14 November 2026. This section supersedes earlier suggestions to make sentiment or quality estimation the main study. Historical diagnostic results remain below for transparency.
+
+## Working title and question
+
+**Lost in Translation? Lexical and Grammatical Differences between Official and Machine-Generated German Parliamentary Texts**
+
+Research question: How do the lexical and grammatical complexity profiles of TranslateGemma-generated German versions of French Curia Vista motion justifications differ from their official German counterparts?
+
+Use "official counterparts" throughout. Original submission language and human-only translation provenance have not been established, so "human translations of the same French original" would overstate the design.
+
+## Motivation and contribution
+
+Translation determines not only which information is conveyed across languages but also how it is expressed. In political communication, vocabulary and grammar are relevant to access to information. The project therefore examines whether a translation model changes these dimensions in a consistent direction, even when it is asked only to translate, not to simplify.
+
+Research on machine translationese provides the theoretical starting point: translated output may favour frequent linguistic patterns and exhibit reduced lexical richness. Political communication research motivates examining distinct dimensions rather than equating common words or short sentences with comprehension. Our contribution is a small, reproducible case study of one open-weight translation model in French-to-German Swiss parliamentary texts. It is not a claim of methodological novelty, demonstrated comprehension improvement, or an economic evaluation of professional translation.
+
+The value is the comparison of multiple dimensions on matched content, plus inspection of what drives measured differences. A single readability score can hide different directions across vocabulary and grammatical features. Mixed results therefore answer the question; they are not failed evidence of simplification.
+
+## Argument supported by the current evidence
+
+The ten-document development pilot was used to select and debug the measures. Definitions were fixed before a separate random sample of twenty documents was translated and evaluated. Treat the twenty as preliminary validation and report the ten separately as development evidence. The new main paired sample contains 260 randomly selected documents across 2000-2025; translation is pending. All texts are full motion justification sections from 2000, not selected sentiment snippets. Translation uses TranslateGemma 4B Q4_K_M through llama-cpp-python; it does not use the downloaded Llama model.
+
+In the twenty-document sample, generated versions have higher content-word Zipf frequency in 18/20 pairs (mean paired change +0.252). Excluding words absent from the frequency resource retains a positive mean difference (+0.145) in 17/20 pairs. Relative-marker density is higher in 17/20, tied in one (mean change +1.116 markers per 100 alphabetic words). Subordinator density rises in 14/20 (+0.571 per 100 words). These findings describe a lexical and grammatical profile; marker counts are not a direct measure of syntactic difficulty.
+
+Lexical diversity is a weaker finding: MATTR50 decreases in 13/20 pairs, with mean change approximately -0.009. It must be reported alongside the stronger findings rather than presented as an equally robust result. LIX is mixed (11 increases, nine decreases), and sentence length, dependency depth and dependency distance do not support a uniform simplification story. No inferential significance claim has yet been established.
+
+A defensible current conclusion is: **In this sample, machine-generated German uses more common content words and more relative-clause markers than the official German versions, while other measures show smaller or inconsistent differences. The results do not support describing the output as uniformly simpler.**
+
+## How examples support the argument
+
+Select examples transparently from largest positive differences, largest negative differences and typical pairs, not only cases matching the headline. Read French, official German and generated German together. Distinguish compound unpacking, alternative sentence construction, terminology substitution, pre-existing bilingual differences and model-introduced meaning changes.
+
+For instance, document 20003462 contrasts official Motorentechnik with generated im Bereich der Motoren. That illustrates why compound unpacking can affect frequency and length measures; it does not by itself establish better comprehension. The same output renders French sans soufre as schwefelarm, illustrating why commoner wording must not be equated with translation adequacy. French interference is another possible explanation for relative-marker differences, which has not been tested and must not be presented as an established model mechanism.
+
+## Threats to interpretation and bounded remaining work
+
+1. Frequency validity: inspect Swiss spelling, terminology, compounds and resource coverage. The covered-only sensitivity already helps, but does not eliminate this concern. Any added spelling sensitivity must be labelled post hoc and preserve the primary results.
+2. Grammatical validity: manually audit tagged markers on a small pre-specified sample, including counterexamples. Do not infer full clause counts or embedding from conjunction/pronoun tags. Noun-chunk measurements are already known to be unreliable and remain diagnostic only.
+3. Sampling uncertainty: show document-level paired differences and estimate uncertainty by resampling whole document pairs, not sentences. Retain all fixed primary measures and all twenty documents. Such uncertainty estimates cannot repair biased measurement or establish generalizability beyond this sampling frame.
+4. Source equivalence: matching IDs and sections controls topic, not exact semantic equivalence or original language. Existing French/German differences prevent causal attribution of every observed change to the model. Describe the result as a matched comparison of versions.
+5. Scope: one model, one quantization, one translation direction, one year, one document type and a small sample. No claims about all LLMs or human translators.
+
+Do not resume sentiment or dictionary fine-tuning as part of this project. The sentiment diagnostics justify narrowing scope but do not prove parliamentary texts lack sentiment. COMETKiwi is optional supporting diagnostic evidence, not the main evaluation; its higher machine scores are not a problem to explain away, and its uneven response to controlled errors limits their interpretation.
+
+## Literature and exact role
+
+- Vanmassenhove, Shterionov and Gwilliam (2021), Machine Translationese: Effects of Algorithmic Bias on Linguistic Complexity in Machine Translation. https://aclanthology.org/2021.eacl-main.188/ . Establishes related lexical-richness questions in MT; different systems and language pairs, not direct validation of TranslateGemma or our metrics.
+- Tolochko, Song and Boomgaarden (2019), That Looks Hard! Effects of Objective and Perceived Textual Complexity on Factual and Structural Political Knowledge. https://doi.org/10.1080/10584609.2019.1631919 . Motivates the relevance of multiple complexity dimensions to political information processing. Its experimental comprehension findings are not outcomes measured by our project.
+- Reveilhac and Schneider (2025), Measuring language complexity about European politics in Swiss parliamentary debates. https://doi.org/10.1075/cilt.370.16rev . Close Swiss contextual precedent and multidimensional approach. Publisher abstract checked; full chapter still needs reading before detailed methodological claims. Deliberate simplification differs from our translation task.
+
+## Expansion plan fixed before additional scoring (14 November 2026)
+
+The main comparison will use ten new paired motion justifications per submission year from 2000 through 2025 (260 documents), conditional on coverage. Sample from sorted eligible IDs with random.Random(45), excluding the thirty documents already inspected during development and validation. Do not select by sentiment, complexity, topic, or translation outcome. Ten per year gives each year equal representation; this is not proportional to the number of motions submitted. The expanded analysis uses the existing fixed measures. The earlier twenty-document sample remains preliminary evidence, not an independent test after further methodological revisions.
+
+The separate historical analysis will retain all available nonempty official German motion justifications in those years, whether or not French is available. Report yearly counts, missing-justification rates, distributions, and uncertainty rather than just pooled means. Keep motion type and ReasonText section fixed. This describes change in the available corpus, not causal change due to AI or a change in verified originals. Topic, author, translation provenance, document length and archival coverage may vary over time. Original submission language remains unverified. A German-only trend does not establish a multilingual Swiss trend.
+
+Freeze the selected IDs before checking translation context limits. Record over-limit documents explicitly; do not silently truncate or redraw them. Resolve any necessary length policy before scoring generated outputs. Compare paired effects overall and descriptively across broader periods; ten pairs per individual year is too small for strong year-specific translation-effect conclusions. Resample whole document pairs for overall paired uncertainty. Agreement across periods is a robustness check, not proof that all sources of confounding are controlled.
+
+### Completed coverage audit and fixed sample
+
+Downloaded all 2000-2025 DE/FR motion records using 500-row pages. Each language returned 11,551 rows, including one exact duplicate in 2024 (ID 20243206); there are 11,550 unique motion IDs per language. Raw responses and query/retrieval metadata are preserved. The 2025 DE count of 710 also matches an independent API count request. The refreshed 2000 fields exactly match the earlier snapshots.
+
+There are 10,622 unique nonempty German justifications and 10,609 pairs with nonempty text in both languages. Flagged 41 German administrative entries: 27 manually verified references to external documents only, nine oral-justification notices, and five punctuation/XXX placeholders. This leaves 10,581 German texts and 10,573 eligible pairs. Exclusions remain visible in motion_corpus.json; source records are not deleted. Reference-only candidates were inspected from texts under 30 words and reference-opening texts under 100 words; this is a documented screening procedure, not a claim of exhaustive semantic validation. Genuine short arguments are retained. Do not substitute these administrative exclusions for a minimum-length rule.
+
+Saved 260 randomly sampled pairs in complexity_expanded_pairs.json: exactly ten per year, seed 45, excluding all thirty previously analysed IDs and flagged administrative entries. Verified unique selected IDs, exact agreement with the corpus, no repeated German text within the sample, and no exact German-text overlap with the thirty prior documents. The model's actual embedded prompt/tokenizer gives 109-1,986 input tokens; all selected documents fit the existing 2,048-token input cap. Length-check details are saved separately. No translations were generated during this audit.
+
+The eligible historical corpus contains 246 groups of identical German texts under different motion IDs (316 additional copies). Keep the motion-level primary analysis but report a sensitivity analysis deduplicating exact texts within year, and consider dependence when estimating uncertainty. Historical changes remain descriptive; these data do not establish original submission language or an effect of AI. No longitudinal complexity results have yet been produced.
+
+## Report structure within the class requirements
+
+The supplied final-report instructions require an English PDF, at most five content pages, 11-point text and a link to reproducible open-source code. They explicitly recognise insights into model behaviour and analyses of model strengths or weaknesses as possible project value. They do not require proving that human translation is superior. No requirement for two notebooks was found in this document.
+
+Suggested allocation: motivation and related work (about one page); data, translation and fixed measures (about one and a half); paired results and examples (about one and a half); discussion, limitations and conclusion (about one). Include one main results table and a document-level figure if space permits. Keep abandoned sentiment exploration brief and quality diagnostics optional. Do not let the report become a chronological account of every attempted project direction.
+
+---
+
+# German structural-complexity pilot
+
+Three complete motion justifications, selected for the earlier criticism pilot. Values are descriptive parser estimates, not representative findings or quality scores.
+
+| Document | Version | Words | Sentences | Words/sentence | Mean tree depth | Mean dependency distance |
+|---|---|---:|---:|---:|---:|---:|
+| 20003117 | official | 197 | 12 | 16.42 | 5.42 | 3.68 |
+| 20003117 | generated | 239 | 14 | 17.07 | 6.36 | 3.00 |
+| 20003148 | official | 375 | 13 | 28.85 | 7.77 | 3.72 |
+| 20003148 | generated | 334 | 12 | 27.83 | 7.75 | 3.69 |
+| 20003220 | official | 74 | 4 | 18.50 | 6.00 | 3.17 |
+| 20003220 | generated | 76 | 4 | 19.00 | 6.25 | 2.72 |
+
+No consistent simplification pattern emerges. Dependency distance decreases in
+all three pairs, although the road-network difference is tiny; sentence length
+and tree depth do not consistently decrease. These measures are related to
+length and are not independent evidence of quality or readability.
+
+Sentence boundaries use German tokenization with punctuation-based sentencizer
+before dependency parsing. Initial unconstrained parsing split "Neueste
+Entwicklungen" and split at a semicolon; the general boundary rule was changed
+for all texts, not individual examples. Checked all resulting sentence boundaries
+against the texts and verified that sentence records preserve all non-whitespace
+source characters. Syntactic analyses themselves are not manually validated.
+
+The opening-hours reference has 12 sentences versus 14 generated. Its long
+comparison of shop regulations is expressed across multiple generated sentences.
+This is a difference between German versions: the French already contains a
+question, so it cannot automatically be attributed to the model simplifying its
+input. The generated version also says 50 stations will open where the official
+version refers to shops in stations. Structural changes are not quality gains.
+
+The road-network output shortens the final comparison and drops details such as
+the initiative identifier; this merits source-based omission inspection rather
+than assuming beneficial compression. Number formatting (e.g. 18 100 versus
+18.100) also affects token counts. No sentiment inference follows from these
+structural results.
+
+## Expanded ten-document pilot (13 November 2026)
+
+All seven additional outputs ended normally. Model settings and paired source texts match the original three. The combined file preserves the original random sample order. All twenty parsed texts retain full non-whitespace text coverage. Completion does not establish translation accuracy.
+
+| Document | Official words | Generated words | Change |
+| --- | ---: | ---: | ---: |
+| 20003039 | 523 | 518 | -1.0% |
+| 20003113 | 407 | 445 | +9.3% |
+| 20003117 | 197 | 239 | +21.3% |
+| 20003148 | 375 | 334 | -10.9% |
+| 20003206 | 72 | 68 | -5.6% |
+| 20003220 | 74 | 76 | +2.7% |
+| 20003241 | 219 | 195 | -11.0% |
+| 20003467 | 558 | 495 | -11.3% |
+| 20003528 | 331 | 381 | +15.1% |
+| 20003529 | 274 | 259 | -5.5% |
+
+Generated texts are shorter in six documents and longer in four. Mean paired word-count difference: -2 words; this small average hides substantial differences in both directions. Numbers count as tokens, so formatting contributes to the differences.
+
+### Provisional syntax measurements
+
+With the current sentence rule, mean sentence length is higher in seven documents, mean tree depth higher in eight, and dependency distance lower in five. These are exploratory counts, not validated evidence of complexity differences.
+
+Boundary inspection found false splits after Art., 31bf. and 31bs. in document 20003113, and a missed boundary after permit type B. across paragraphs in generated document 20003039. List items also have different punctuation across versions. Sentence-dependent measures require a consistent boundary correction and sensitivity check before reporting substantive conclusions. Do not silently exclude problematic documents.
+
+### Source checks and interpretation
+
+- Document 20003113: official German says 430 Prozent, French input says 4,0 %, and generated German says 4,0%. This discrepancy predates model generation. Likewise, the French quotation differs from the German quotation; differences from the German reference alone are not model errors.
+
+- Document 20003529: French du côté saint-gallois becomes auf der gallischen Seite, whereas official German says auf der St. Galler Seite. This is a concrete place-name mistranslation, not a complexity measure. French en 2015 au plus tôt becomes voraussichtlich bis 2015; this also changes the timing constraint. These are illustrative observations, not an estimated error rate.
+
+- Document 20003039: the model adds Fachhochschulen as an explanation of EPF, whereas the official German uses ETH. This shows why expansion cannot automatically be interpreted as useful clarification.
+
+The sample supports a descriptive comparison of official and model-generated German versions. It does not establish a consistent simplification effect, human-only provenance, the original submission language, or whether human translation is economically worthwhile. The first three documents informed the method, so this is an exploratory pilot rather than an independent confirmatory test.
+
+## Multi-measure exploratory evaluation (13 November 2026)
+
+Installed wordfreq 3.1.1 with user permission. All measures run on the same ten complete justification pairs. No additional translations or language models. Results are in data/processed/complexity_multimeasure_pilot.json; reproduce with .venv/bin/python lost_in_translation/scripts/compare_complexity.py from the NLP folder.
+
+Corrected the general segmentation rule for both versions: preserve Art./art. and digit-letter legal references as tokenizer exceptions; start each nonempty source line as a new sentence. This handles lists as separate units even without final punctuation. Prior outputs are retained. Full non-whitespace coverage verified for all twenty texts. This is a documented operational definition, not gold-standard linguistic segmentation.
+
+| Measure | Official mean | Generated mean | Generated lower / higher / tied |
+| --- | ---: | ---: | --- |
+| Letters per alphabetic word | 6.365 | 6.199 | 7 / 3 / 0 |
+| Words longer than six letters (%) | 38.222 | 37.746 | 8 / 2 / 0 |
+| Content-word frequency (Zipf; higher = commoner) | 4.073 | 4.301 | 1 / 9 / 0 |
+| Frequency excluding unlisted words (Zipf) | 4.270 | 4.413 | 0 / 10 / 0 |
+| Unlisted content words (%) | 4.640 | 2.546 | 7 / 3 / 0 |
+| Lemma diversity, 25-word windows | 0.856 | 0.835 | 8 / 2 / 0 |
+| Lemma diversity, 50-word windows | 0.780 | 0.758 | 8 / 2 / 0 |
+| Content-word proportion (%) | 52.520 | 50.915 | 8 / 2 / 0 |
+| Subordinators per 100 words | 1.751 | 2.590 | 1 / 9 / 0 |
+| Relative markers per 100 words | 0.981 | 1.725 | 0 / 8 / 2 |
+| Words per base noun phrase (unreliable) | 1.967 | 1.970 | 3 / 7 / 0 |
+| Words per sentence | 19.956 | 20.874 | 3 / 7 / 0 |
+| Sentence tree depth | 5.967 | 6.315 | 2 / 8 / 0 |
+| Dependency distance | 3.213 | 3.073 | 5 / 5 / 0 |
+| LIX readability index | 57.425 | 57.970 | 5 / 5 / 0 |
+
+Means give each document equal weight. Differences are paired. No significance tests or selection by p-value. All measures are retained, including mixed and unreliable results.
+
+### Interpretation and measurement quality
+
+- Vocabulary frequency: most promising complementary descriptive measure. Generated content words are commoner in 9/10 pairs; 10/10 when excluding zero-frequency entries. Both versions use many compounds and specialist terms. Swiss spellings and vocabulary are not necessarily well represented in the general German resource. Missing entries are not proof of difficult words. Frequencies concern surface forms and exclude proper-noun tags; tagging errors remain possible.
+
+- Lexical diversity: generated texts have lower MATTR in 8/10 pairs at both window sizes. This describes vocabulary repetition, not readability or adequacy. Lemmatization errors can influence the result.
+
+- Clause markers: subordinator density is higher in 9/10 pairs; relative-marker density higher in 8/10 and tied in two. These are tagged conjunction/pronoun counts, not validated counts of clauses, nesting, or difficulty. In the two shortest documents, each version has one subordinator: different normalized values reflect denominators, not extra clauses.
+
+- Lexical density: lower in 8/10 but automatic POS tags introduce noise. The biggest changes include the shortest texts; treat this as supporting description.
+
+- Base noun phrases: do not use as a main conclusion. Inspection found implausible chunks, including zusammengebrochen und hinterlassen Verluste, and a generated A53 chunk ending in muss. The mean difference is approximately zero anyway. Base chunks also do not represent full nested noun phrases.
+
+- LIX: mixed directions (5/10 higher). It combines length-related features, so it is not independent confirmation of those features. No German grade-level or comprehension claims. Syllable-based formulas were not added: this evaluates the readability-formula family without an additional syllable approximation.
+
+### Short-text sensitivity
+
+Excluding the two pairs with fewer than 100 alphabetic words on either side leaves eight pairs. This is a diagnostic check, not a revised sample:
+- Lemma diversity, 25-word windows: mean difference -0.020; generated lower in 6, higher in 2.
+- Lemma diversity, 50-word windows: mean difference -0.025; generated lower in 7, higher in 1.
+- Content-word proportion (%): mean difference -1.942; generated lower in 7, higher in 1.
+- Subordinators per 100 words: mean difference +1.046; generated lower in 0, higher in 8.
+- Relative markers per 100 words: mean difference +0.930; generated lower in 0, higher in 8.
+- LIX readability index: mean difference -1.123; generated lower in 5, higher in 3.
+
+### Scope and next use
+
+These are exploratory findings from ten documents already used to develop the method. More common vocabulary alongside more clause markers is a hypothesis for a fresh sample, not a confirmed general effect or proof of quality. Keep a fixed set covering frequency, diversity and clause markers, with lexical density and the mixed readability results reported alongside them. Do not drop a valid measure because it lacks a favourable result. No inference that official German is always a human translation of the supplied French.
+
+Implementation checks: all twenty texts retain full coverage; MATTR and density ranges checked; LIX arithmetic checked; a 60-word repeated-sentence control yields 20 sentences and MATTR50 = 3/50. Remaining parser errors are explicitly documented above.
+
+### Method references
+
+- German multidimensional readability: https://aclanthology.org/C18-1026/
+
+- MATTR definition: https://lexicalrichness.readthedocs.io/en/stable/
+
+- Base noun-phrase limitations: https://spacy.io/api/doc/
+
+- Wordfreq frequency scale and resource: https://github.com/rspeer/wordfreq
+
+- LIX implementation reference: https://saphes.readthedocs.io/en/latest/reference/readability/
+
+## Fresh 20-document evaluation (13 November 2026)
+
+Verified all 20 outputs are nonempty and stop-terminated, match the selected French/German inputs, share pilot model settings and have no IDs overlapping the pilot. A normal stop is not evidence of semantic completeness. Ran the fixed measures without changing their definitions. Full non-whitespace text coverage verified for all forty parsed texts.
+
+| Measure | Official mean | Generated mean | Difference | Lower / higher / tied |
+| --- | ---: | ---: | ---: | --- |
+| Content-word Zipf frequency | 4.098 | 4.351 | +0.252 | 2 / 18 / 0 |
+| Zipf frequency, covered words only | 4.275 | 4.420 | +0.145 | 3 / 17 / 0 |
+| Unlisted content words (%) | 4.173 | 1.577 | -2.596 | 16 / 3 / 1 |
+| Lemma MATTR50 | 0.780 | 0.770 | -0.009 | 13 / 7 / 0 |
+| Lemma MATTR25 | 0.859 | 0.848 | -0.011 | 14 / 6 / 0 |
+| Subordinators per 100 words | 1.348 | 1.919 | +0.571 | 6 / 14 / 0 |
+| Relative markers per 100 words | 0.763 | 1.879 | +1.116 | 2 / 17 / 1 |
+| Lexical density (%) | 54.069 | 53.355 | -0.714 | 13 / 7 / 0 |
+| Words per sentence | 19.862 | 20.918 | +1.056 | 8 / 12 / 0 |
+| Tree depth | 6.275 | 6.406 | +0.131 | 8 / 12 / 0 |
+| Dependency distance | 3.106 | 3.042 | -0.065 | 11 / 9 / 0 |
+| Base noun-phrase length (diagnostic) | 2.003 | 1.998 | -0.004 | 9 / 11 / 0 |
+| LIX | 58.639 | 60.536 | +1.896 | 9 / 11 / 0 |
+
+Differences are generated minus official, giving each document equal weight. This fresh sample is kept separate from the development pilot. No statistical significance or population-wide claim is made.
+
+### Interpretation
+
+The strongest descriptive replication is higher general-language word frequency: 18/20 including zero entries, 17/20 covered-only. Relative markers rise in 17/20 (one tie); subordinators rise in 14/20. Lemma diversity declines in 13/20 at window 50, so that pattern is weaker than in the pilot. LIX rises in 11/20 and falls in 9/20; its mean increases by 1.896. These findings support a mixed vocabulary/grammar profile, not uniformly easier texts or superior translations.
+
+### Inspection and limitations
+
+- 20003462 has the largest frequency increase (+0.550 Zipf). Official Motorentechnik corresponds to generated im Bereich der Motoren; Motorfahrzeugbestand to Fahrzeugpark. Unpacking compounds can raise frequency. Generated wording also changes French carburant sans soufre to Schwefelarmem Kraftstoff; therefore commoner wording does not establish equivalent meaning.
+
+- 20003371 has the largest MATTR50 decrease (-0.066). Both versions repeat their levy terminology (Lenkungsabgabe / Anreizsteuer); the score does not alone identify a translation error. French transports terrestres becomes Güterverkehr, narrowing the meaning. Conversely the closing Umweltbewusstsein follows the French conscience écologique whereas official German says Sicherheitsdenken: that difference predates generation.
+
+- 20003105 has the largest subordinator-density increase (+2.723 per 100 words). Generated Es ist unerlässlich, dass ... insbesondere wenn ... contrasts with official Die Messungen ... sind bedeutungsvoll, insbesondere weil ... . This is an interpretable structural change, not a validated increase in reading difficulty.
+
+- Sentence inspection flagged headings in 20003266 (Föderalismus, KMU-Förderung, Deregulierung); the generated output adds Markdown formatting. Under the fixed rule headings/list items count as sentence units. Another short generated unit, Man könnte beispielsweise:, is a list introduction. Do not silently change the rule after seeing results. Noun chunks remain an unreliable diagnostic.
+
+### Sensitivity checks
+
+
+exclude_short: 17 pairs; diagnostic only, all twenty remain in the main results.
+- Content-word Zipf frequency: mean difference +0.254; lower 2, higher 15.
+- Lemma MATTR50: mean difference -0.008; lower 10, higher 7.
+- Subordinators per 100 words: mean difference +0.571; lower 4, higher 13.
+- Relative markers per 100 words: mean difference +1.116; lower 2, higher 15.
+- LIX: mean difference +1.720; lower 9, higher 8.
+
+exclude_headings: 19 pairs; diagnostic only, all twenty remain in the main results.
+- Content-word Zipf frequency: mean difference +0.246; lower 2, higher 17.
+- Lemma MATTR50: mean difference -0.008; lower 12, higher 7.
+- Subordinators per 100 words: mean difference +0.587; lower 6, higher 13.
+- Relative markers per 100 words: mean difference +1.154; lower 2, higher 16.
+- LIX: mean difference +1.650; lower 9, higher 10.
+
+Reproduce with compare_complexity(Path("lost_in_translation"), "complexity_validation_translations.json", "complexity_validation_results.json"). Input/output filename parameters were added; pilot defaults and metric definitions are unchanged.
+
+## Historical complexity results (14 November 2026)
+
+Scored all 10,581 eligible German justifications, 2000-2025. Every ID and yearly count matches the audited corpus. All alphanumeric text is represented in the measured sentences; punctuation-only fragments are intentionally not sentence units under the unchanged measurement rule. Verified LIX arithmetic and MATTR bounds for every document. All thirty previously scored official texts reproduce exactly. MATTR50 is unavailable for 149 short texts; report metric-specific N, never impute zero.
+
+The following descriptive comparison gives each of the five yearly means equal weight within 2000-2004 and 2021-2025. These periods were summarised after scoring for readability; the full annual series remains the main historical result. This is not a fitted linear trend or a significance test.
+
+| Measure | 2000-2004 | 2021-2025 | Difference |
+|---|---:|---:|---:|
+| word_count | 262.0994 | 220.9274 | -41.1721 |
+| sentence_count | 13.0657 | 11.1437 | -1.9220 |
+| mean_sentence_words | 20.5897 | 20.5387 | -0.0510 |
+| mean_sentence_tree_depth | 6.1786 | 6.1368 | -0.0418 |
+| mean_dependency_distance | 3.0998 | 3.0235 | -0.0763 |
+| mean_content_word_zipf | 4.0188 | 4.0569 | +0.0381 |
+| mean_covered_content_word_zipf | 4.2179 | 4.2266 | +0.0087 |
+| unlisted_content_word_percent | 4.7514 | 4.0392 | -0.7122 |
+| alphabetic_word_count | 253.1098 | 212.8313 | -40.2784 |
+| mean_word_characters | 6.6555 | 6.5646 | -0.0909 |
+| long_word_percent | 40.6288 | 40.0057 | -0.6231 |
+| lexical_density_percent | 54.0123 | 53.9741 | -0.0381 |
+| mattr_25 | 0.8500 | 0.8521 | +0.0021 |
+| mattr_50 | 0.7735 | 0.7742 | +0.0007 |
+| subordinators_per_100_words | 1.5391 | 1.5843 | +0.0452 |
+| relative_markers_per_100_words | 0.8637 | 0.9058 | +0.0422 |
+| mean_base_noun_phrase_words | 2.0037 | 1.9397 | -0.0640 |
+| lix | 60.5523 | 59.8119 | -0.7403 |
+
+The clearer endpoint contrast is document length: approximately 262 versus 221 words, while mean sentence length is approximately 20.59 versus 20.54 words. This supports a descriptive distinction between shorter documents and simpler sentences. Vocabulary-frequency change is small (+0.038 Zipf) and smaller when restricted to covered words (+0.009); lexical diversity is nearly unchanged in this period comparison. Do not claim uniform simplification, monotonic change, or an AI effect.
+
+Frequency uses a fixed wordfreq reference for all years; it does not measure contemporaneous familiarity. Topic, author, document length and archival coverage can change. In 2000, 68/322 records have no nonempty German justification; in 2025 this is 23/710. This coverage difference limits historical interpretation. No original-language or human-only provenance has been established.
+
+Exact-text deduplication within year remains a sensitivity analysis; the figure shows both series. Largest absolute changes in annual means after deduplication:
+- mean_content_word_zipf: 0.0041.
+- mattr_50: 0.0008.
+- relative_markers_per_100_words: 0.0156.
+- lix: 0.1556.
+
+Figure: figures/historical_complexity.png. Full document measurements, annual summaries and runtime versions: data/processed/historical_complexity.json. The 260 new translations remain pending; do not use the historical results as translation-effect evidence.

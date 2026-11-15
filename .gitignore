@@ -1,0 +1,12 @@
+# Keep machine-specific environments and large models local
+.venv/
+.venv-*/
+models/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.env.*
+*.tmp
+# Keep the compressed historical result as the committed snapshot
+/data/processed/historical_complexity.json

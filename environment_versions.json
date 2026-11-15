@@ -1,0 +1,15 @@
+{
+  "python": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+  "packages": {
+    "spacy": "3.8.16",
+    "numpy": "2.5.3",
+    "matplotlib": "3.11.1",
+    "wordfreq": "3.1.1",
+    "lxml": "6.1.3",
+    "llama-cpp-python": "0.3.36",
+    "jinja2": "3.1.6",
+    "de-core-news-sm": "3.8.0"
+  },
+  "note": "Observed working environment. Direct requirements are pinned; transitive dependencies are not fully locked. A fresh installation on another computer has not been tested."
+}
