@@ -10,6 +10,7 @@ def translate_pilot(
     project_dir: Path,
     input_name: str = "pilot_pairs.json",
     output_name: str = "pilot_translations.json",
+    record_over_limit: bool = False,
 ) -> None:
     """Translate the French pilot texts using the GGUF's embedded template.
 
@@ -17,6 +18,10 @@ def translate_pilot(
         project_dir: Project directory containing the model and pilot data.
         input_name: Input JSON filename in data/processed.
         output_name: Output JSON filename in data/processed.
+        record_over_limit: If True, a document whose prompt exceeds the 2048-token
+            input limit is saved as a failed attempt (finish_reason
+            "input_over_limit") instead of stopping the run. Default False keeps
+            the original behaviour.
     """
     # Load the pilot and local translation model
     data = json.loads((project_dir / "data/processed" / input_name).read_text(encoding="utf-8"))
@@ -63,7 +68,17 @@ def translate_pilot(
         prompt = template.render(messages=messages, bos_token="<bos>", add_generation_prompt=True)
         tokens = model.tokenize(prompt.encode("utf-8"), add_bos=False, special=True)
         if len(tokens) > 2048:
-            raise ValueError(f"Document {record['document_id']} exceeds the pilot's 2048-token input limit.")
+            if not record_over_limit:
+                raise ValueError(f"Document {record['document_id']} exceeds the pilot's 2048-token input limit.")
+            # Keep the fixed sample: record the document as a failure, never truncate or redraw
+            output["failed_records"].append({**record, "translation_de": "", "prompt": prompt,
+                                             "finish_reason": "input_over_limit",
+                                             "usage": {"prompt_tokens": len(tokens)}, "generation_seconds": 0.0})
+            temporary_path = output_path.with_suffix(".tmp")
+            temporary_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            temporary_path.replace(output_path)
+            print(f"Flagged over input limit ({len(tokens)} tokens): {record['document_id']}", flush=True)
+            continue
 
         # Generate without showing the model the German reference
         print(f"Translating {record['document_id']}...", flush=True)
