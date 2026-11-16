@@ -112,5 +112,7 @@ November 2026. We analyse the justification (`ReasonText`) of all motions
 
 ## Licence
 
-<!-- TODO: choose a licence before making the repository public, e.g. MIT for the code. -->
-Code: to be added. Parliamentary texts: Swiss Parliament open data, subject to its terms of use.
+The code, figures and derived results in this repository are released under the
+[MIT License](LICENSE). The parliamentary texts in `data/` come from the Swiss
+Parliament's open data service and remain subject to its terms of use; the
+TranslateGemma model is subject to its own licence.
