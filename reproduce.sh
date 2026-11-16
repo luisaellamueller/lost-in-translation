@@ -33,4 +33,7 @@ python scripts/special_characters.py
 echo "== 7. Appendix A"
 python scripts/historical_summary.py
 
+echo "== 8. Unit and regression tests"
+python -m pytest -q
+
 echo "Done. Results in results/, figures in docs/figures/."

@@ -31,6 +31,7 @@ results/                  tables written by the scripts (Markdown / CSV)
 docs/figures/             figures used in the report
 docs/report_numbers.md    which script produces which number in the report
 docs/methods_log.md       development log, including abandoned approaches
+tests/                    unit and regression tests (pytest)
 reproduce.sh              reruns every analysis in the report
 ```
 
@@ -73,6 +74,18 @@ It does not regenerate the machine translations (see below).
 redraw the appendix figure, unpack it first:
 `python -c "import gzip,shutil; shutil.copyfileobj(gzip.open('data/processed/historical_complexity.json.gz'), open('data/processed/historical_complexity.json','wb'))"`.
 
+### Tests
+
+```bash
+python -m pytest -q
+```
+
+`tests/test_rules.py` checks the rules behind the results (author-language
+inference, terminology matching, dash definition, Fisher test). `tests/test_report_numbers.py`
+reruns the analyses on the committed data and checks the numbers printed in the report
+(sample, Table 1, *ß* counts, RQ1 differences, Fisher p-value). `reproduce.sh` runs the
+tests as its last step.
+
 ### Regenerating the machine translations (optional)
 
 The translations are saved in `data/processed/complexity_fr_author_translations.json`.
@@ -89,6 +102,33 @@ shasum -a 256 models/translategemma-4b-it-Q4_K_M.gguf
 
 Then follow `docs/french_sample_howto.md`. Model weights are not redistributed here;
 check the model's licence at its source.
+
+## Development material (not used in the report)
+
+Some files document earlier steps and are kept because later scripts reuse them:
+
+- `complexity_expanded_*` (data/processed), `prepare_expanded_sample.py`,
+  `docs/expanded_comparison.md`: the first sample of 260 motions regardless of author
+  language. Most of these were German originals, so the model translated a translation
+  back; this is why we switched to French-authored motions. `prepare_french_sample.py`
+  reuses its 63 French-authored translations and its 30 development IDs, and
+  `check_data.py` still checks it.
+- `prepare_pilot.py`, `complexity_translations.json`, `complexity_validation_*`,
+  `complexity_multimeasure_pilot.json`, `docs/complexity_pilot_review.md`: the
+  10-document pilot and 20-document evaluation used to fix the complexity measures.
+- `author_language.py`, `sample_author_language.csv`: author language for the first
+  sample only; superseded by `author_language_corpus.py`.
+- `explore_2025_shift.py`: exploration of the 2025 change in the historical series.
+- `results/terminology_review_french.csv`: empty annotation sheet written by
+  `swiss_conventions.py`; the terminology results are in `results/terminology_french.md`.
+
+## Contributions
+
+- **Klara Kolarova:** corpus retrieval and cleaning, complexity measures, historical
+  analysis, first translation sample and translation pipeline.
+- **Luisa Müller:** French-authored sample and author-language inference, RQ2 and RQ3
+  analyses (conventions, terminology, screening, similarity over time), reproducibility
+  scripts, report.
 
 ## Data
 

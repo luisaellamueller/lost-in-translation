@@ -54,6 +54,20 @@ ABBREVIATIONS = {
 }
 
 
+def machine_rendering(term: str, german: str) -> str:
+    """Return "kept" if the Swiss term appears in the German text, else the alternative used."""
+    _, de_pat, alternatives, fallback = TERMS[term]
+    if re.search(de_pat, german):
+        return "kept"
+    return next((label for label, p in alternatives if re.search(p, german)), fallback)
+
+
+def keeps_french_abbreviation(abbreviation: str, german: str) -> bool:
+    """True if the French abbreviation appears in the German text and the Swiss German one does not."""
+    return bool(re.search(rf"\b{abbreviation}\b", german)) and not re.search(
+        rf"\b{ABBREVIATIONS[abbreviation]}\b", german)
+
+
 def sentences(text: str) -> list[str]:
     return re.split(r"(?<=[.!?])\s+", text)
 
@@ -71,8 +85,7 @@ def main() -> None:
         for r in docs:
             off = bool(re.search(de_pat, r["reference_de"]))
             mt = bool(re.search(de_pat, r["translation_de"]))
-            rendering = "kept" if mt else next(
-                (label for label, p in alternatives if re.search(p, r["translation_de"])), fallback)
+            rendering = machine_rendering(term, r["translation_de"])
             off_keep += off
             mt_keep += mt
             if not mt:
@@ -95,8 +108,7 @@ def main() -> None:
         if not found:
             continue
         with_abbr += 1
-        keeps = lambda text: [a for a in found
-                              if re.search(rf"\b{a}\b", text) and not re.search(rf"\b{ABBREVIATIONS[a]}\b", text)]
+        keeps = lambda text: [a for a in found if keeps_french_abbreviation(a, text)]
         mt_list, off_list = keeps(r["translation_de"]), keeps(r["reference_de"])
         mt_french += bool(mt_list)
         off_french += bool(off_list)
