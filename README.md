@@ -1,5 +1,7 @@
 # Lost in Translation? Machine Translation and Swiss Parliamentary Texts
 
+[![tests](https://github.com/luisaellamueller/lost-in-translation/actions/workflows/tests.yml/badge.svg)](https://github.com/luisaellamueller/lost-in-translation/actions/workflows/tests.yml)
+
 Project for *Essentials in Text and Speech Processing* (ETH Zürich, Fall Semester 2026)
 by **Luisa Müller** and **Klara Kolarova**.
 
@@ -32,6 +34,7 @@ docs/figures/             figures used in the report
 docs/report_numbers.md    which script produces which number in the report
 docs/methods_log.md       development log, including abandoned approaches
 tests/                    unit and regression tests (pytest)
+.github/workflows/        continuous integration (see Quality assurance)
 reproduce.sh              reruns every analysis in the report
 ```
 
@@ -74,18 +77,6 @@ It does not regenerate the machine translations (see below).
 redraw the appendix figure, unpack it first:
 `python -c "import gzip,shutil; shutil.copyfileobj(gzip.open('data/processed/historical_complexity.json.gz'), open('data/processed/historical_complexity.json','wb'))"`.
 
-### Tests
-
-```bash
-python -m pytest -q
-```
-
-`tests/test_rules.py` checks the rules behind the results (author-language
-inference, terminology matching, dash definition, Fisher test). `tests/test_report_numbers.py`
-reruns the analyses on the committed data and checks the numbers printed in the report
-(sample, Table 1, *ß* counts, RQ1 differences, Fisher p-value). `reproduce.sh` runs the
-tests as its last step.
-
 ### Regenerating the machine translations (optional)
 
 The translations are saved in `data/processed/complexity_fr_author_translations.json`.
@@ -102,6 +93,34 @@ shasum -a 256 models/translategemma-4b-it-Q4_K_M.gguf
 
 Then follow `docs/french_sample_howto.md`. Model weights are not redistributed here;
 check the model's licence at its source.
+
+## Quality assurance
+
+Every push and pull request runs the GitHub Actions workflow
+[`.github/workflows/tests.yml`](.github/workflows/tests.yml) on a fresh Linux machine
+(Python 3.14). The badge at the top shows the status of the latest run.
+
+| Stage | What is checked | How |
+|---|---|---|
+| 1. Data consistency | 32 checks of the corpus, raw API pages, historical scores, sample and translations (e.g. 10,573 pairs, 41 exclusions, no HTML left, German and French fields in the right language) | `scripts/check_data.py`, fails the run on any failed check |
+| 2. Offline rerun | author language, sample, RQ1 table and Figure 2, terminology (Table 1), screening, special characters (Table 2), appendix numbers are recomputed from the committed data | the analysis scripts listed above |
+| 3. Results unchanged | the rerun must reproduce the committed results byte for byte, so no result file can drift from its code | `git diff --exit-code -- results/` |
+| 4. Unit tests | the rules behind the results: author-language inference, terminology matching, abbreviation rule, dash definition, Fisher test (against its formula and a simulation) | `tests/test_rules.py` |
+| 5. Regression tests | the numbers printed in the report: 259 + 1 translations, reproducible sample, 10,573 and 2,245 pairs, every row of Table 1, *ß* in 193 vs 0 texts, RQ1 differences and intervals, p = 0.008, screening annotations covering the drawn sample | `tests/test_report_numbers.py` |
+
+The spaCy complexity scoring and the chrF/BLEU similarity are not rerun in CI, because
+they need the full parser installation; they run locally with `reproduce.sh`, and the
+regression tests check their saved outputs. The human judgements of the screening
+(`results/screening_annotations_french.csv`) cannot be recomputed; stage 5 checks that
+they cover exactly the randomly drawn and automatically flagged texts.
+
+Run the same checks locally:
+
+```bash
+python scripts/check_data.py
+python -m pytest -q
+bash reproduce.sh          # full pipeline including spaCy and chrF; ends with the tests
+```
 
 ## Development material (not used in the report)
 
