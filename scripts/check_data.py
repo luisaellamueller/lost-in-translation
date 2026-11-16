@@ -252,6 +252,8 @@ def main():
     check_sample_and_translations(recs)
     c = collections.Counter(s for s, _, _ in RESULTS)
     print(f"\nSummary: {c['PASS']} pass, {c['WARN']} warn, {c['FAIL']} fail")
+    if c["FAIL"]:
+        raise SystemExit(1)  # make failures visible to scripts and CI
 
 
 if __name__ == "__main__":

@@ -1,0 +1,41 @@
+# Continuous integration: on every push and pull request, rerun the data checks,
+# the analyses that need no parser or MT model, and the unit/regression tests.
+# The spaCy complexity scoring (compare_expanded.py) and sacreBLEU similarity run
+# locally via reproduce.sh; their saved outputs are checked by the regression tests.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install test dependencies
+        run: python -m pip install pytest==9.1.1 matplotlib==3.11.1
+
+      - name: Data consistency checks
+        run: python scripts/check_data.py
+
+      - name: Rerun analyses (offline, from committed data)
+        run: |
+          python scripts/author_language_corpus.py
+          python scripts/prepare_french_sample.py --check
+          python scripts/report_rq1.py
+          python scripts/terminology_check.py
+          python scripts/screen_translations.py
+          python scripts/special_characters.py
+          python scripts/historical_summary.py
+
+      - name: Results unchanged by the rerun
+        run: git diff --stat --exit-code -- results/ data/processed/french_authored_motions.csv
+
+      - name: Unit and regression tests
+        run: python -m pytest -q
