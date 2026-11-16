@@ -1,198 +1,116 @@
-# Lost in Translation
+# Lost in Translation? Machine Translation and Swiss Parliamentary Texts
 
-Current complexity study, prepared for Klara and Luisa on 15 November 2026.
-Read [HANDOVER.md](HANDOVER.md) first for the research question, completed work,
-limitations and next tasks. This is a local Git repository with an initial snapshot
-commit. No remote repository has been created or published.
+Project for *Essentials in Text and Speech Processing* (ETH Zürich, Fall Semester 2026)
+by **Luisa Müller** and **Klara Kolarova**.
 
-## What is ready
+Swiss parliamentary texts are published in German, French and Italian. This project
+asks what would change if official translations were replaced by unrevised machine
+translation (MT). We translate the French justifications of federal motions into
+German with an open-weight MT model (TranslateGemma 4B) and compare the output with
+the official German translation of the same text.
 
-- Historical analysis: 10,581 official German motion justifications, 2000-2025.
-- Translation sample: 260 pairs, ten per year; 259 completed outputs and one
-  preserved failed attempt (20013159). Completion is not a quality guarantee.
-- Main expanded paired comparison: a runnable completed-case analysis of 259
-  normally stopped outputs, with one failure explicitly reported. Quality screening
-  remains pending; these are preliminary measurements, not validated translation-quality findings.
-- Existing ten-document development and twenty-document validation results are
-  included as preliminary evidence, not results for the expanded sample.
+## Research questions and main findings
 
-## Open the project
+| | Question | Finding (259 French-authored motions, 2000–2025) |
+|---|---|---|
+| RQ1 | How does MT output differ from official translations in linguistic complexity? | MT uses more common words (+0.12 Zipf) but builds harder sentences: longer (+1.1 words), more deeply nested (+0.28 levels), with 15% more subordinate and 27% more relative clause markers; LIX +1.8. |
+| RQ2 | Does MT respect Swiss conventions and parliamentary terminology? | No. It writes *ß* in 193 of 259 texts (official: 0), uses German number and quotation formats, renders *Interpellation* as *Anfrage* (12 of 15) and *Motion* as *Antrag* (18 of 43), and keeps French abbreviations (*AVS* for *AHV*) in 41 of 54 texts. |
+| RQ3 | Have official translations become more similar to MT output over time? | Yes, since about 2015: chrF rises from 55.9 (2010–2014) to 61.4 (2023–2025). Surface errors of unrevised MT (*ß*) do not appear in official translations (0 of 435 in 2023–2025). |
 
-Unzip the archive and open the `lost-in-translation` folder in your editor.
-Run all commands below from that folder. Paths are relative to this repository;
-there is no outer `NLP/lost_in_translation` directory in this package.
+The full report is submitted separately as a PDF. `docs/report_numbers.md` lists, for
+every number in the report, the script and output file that produce it.
+
+## Repository structure
+
+```
+data/raw/                 Curia Vista API snapshots (motions 2000–2025, DE and FR)
+data/raw/author_api/      API snapshot of motion authors and members (author language)
+data/processed/           cleaned corpus, sample, machine translations, measurements
+scripts/                  all code (see table below)
+results/                  tables written by the scripts (Markdown / CSV)
+docs/figures/             figures used in the report
+docs/report_numbers.md    which script produces which number in the report
+docs/methods_log.md       development log, including abandoned approaches
+reproduce.sh              reruns every analysis in the report
+```
+
+## Setup
+
+Tested with Python 3.14.7 on Apple Silicon macOS (direct dependency versions in
+`environment_versions.json`).
 
 ```bash
-git status
-git log -1 --oneline
-python3 --version
+git clone https://github.com/luisaellamueller/lost-in-translation.git
+cd lost-in-translation
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-The recorded working environment uses Python 3.14.7 on Apple Silicon macOS.
-Use that version where possible. Other Python/OS combinations have not been
-validated. `environment_versions.json` records observed direct dependencies;
-this is not a complete transitive lockfile. Downloads require internet access.
-The optional translation dependencies are not needed for analysing saved output.
-
-## Unpack the detailed historical results
-
-The 177 MB JSON is stored losslessly as gzip, to keep the tracked file small.
-The unpacked file is ignored by Git; retain the gzip snapshot.
+## Reproduce all results
 
 ```bash
-python - <<'PYCODE'
-import gzip
-import shutil
-from pathlib import Path
-
-folder = Path("data/processed")
-with gzip.open(folder / "historical_complexity.json.gz", "rb") as source:
-    with (folder / "historical_complexity.json").open("wb") as target:
-        shutil.copyfileobj(source, target)
-PYCODE
+bash reproduce.sh            # offline, from the data in the repository (a few minutes)
+bash reproduce.sh --fetch    # also re-downloads the author data from the Parliament API
 ```
 
-The chart is already available at `docs/figures/historical_complexity.png`.
-To redraw it from the saved measurements without rescoring:
+This recomputes every number, table and figure in the report from the committed data.
+It does not regenerate the machine translations (see below).
 
-```bash
-python - <<'PYCODE'
-import sys
-from pathlib import Path
+| Step | Script | What it does |
+|---|---|---|
+| Corpus | `audit_motion_coverage.py`, `check_data.py` | builds the corpus of 10,573 German–French motion justifications (2000–2025) and runs 32 consistency checks |
+| Author language | `author_language_corpus.py` | infers the language each motion was written in from the submitting member (canton; biography language for bilingual cantons); 2,245 French-authored pairs |
+| Sample | `prepare_french_sample.py` | 10 French-authored motions per year (260), seed 48; `--check` verifies the saved sample |
+| Translation | `translate_pilot.py` | TranslateGemma 4B, temperature 0, seed 42 (259 completed, 1 output-limit failure) |
+| RQ1 | `compare_expanded.py --french`, `report_rq1.py` | 18 complexity measures (spaCy `de_core_news_sm`, wordfreq), paired bootstrap; Figure 2 |
+| RQ2 | `swiss_conventions.py --french`, `terminology_check.py`, `screen_translations.py` | Swiss conventions, Table 1 (terminology), screening of the outputs |
+| RQ3 | `similarity_over_time.py`, `special_characters.py` | chrF/BLEU over time (Figure 3); *ß* and dashes, Table 2 |
+| Appendix | `score_historical_complexity.py`, `historical_summary.py` | complexity of all 10,581 official German texts, 2000–2025 |
 
-sys.path.insert(0, str(Path("scripts").resolve()))
-from score_historical_complexity import plot_history
+`score_historical_complexity.py` reparses all 10,581 texts (slow) and is not part of
+`reproduce.sh`; its saved output is `data/processed/historical_complexity.json.gz`. To
+redraw the appendix figure, unpack it first:
+`python -c "import gzip,shutil; shutil.copyfileobj(gzip.open('data/processed/historical_complexity.json.gz'), open('data/processed/historical_complexity.json','wb'))"`.
 
-plot_history(Path("."))
-PYCODE
-```
+### Regenerating the machine translations (optional)
 
-## Reproduce the data and analyses
-
-These commands overwrite their derived outputs. Work on a branch and inspect
-`git diff` before committing. The scripts reuse the bundled raw snapshots; a
-normal rerun therefore does not fetch a new corpus silently.
-
-```bash
-python scripts/audit_motion_coverage.py
-python scripts/prepare_expanded_sample.py
-python scripts/score_historical_complexity.py
-```
-
-The last command reparses all 10,581 documents and recreates the figure. It can
-take several minutes. It uses the shared `load_parser` and `measure_text` functions
-from `scripts/compare_complexity.py`.
-
-To reproduce the twenty-document preliminary validation result:
-
-```bash
-python - <<'PYCODE'
-from pathlib import Path
-from scripts.compare_complexity import compare_complexity
-
-compare_complexity(
-    Path("."),
-    input_name="complexity_validation_translations.json",
-    output_name="complexity_validation_results.json",
-)
-PYCODE
-```
-
-## Run the expanded translation comparison
-
-After installing `requirements.txt`, run from the repository root:
-
-```bash
-python scripts/compare_expanded.py
-```
-
-This checks all 260 attempts against the selected sample, measures the 259 normally
-stopped outputs using the same German parser for both versions, and explicitly
-reports failed document 20013159. It does not modify the original translations or
-retry the failure. Missing measures use complete pairs and report their N.
-
-Outputs (already bundled, so Luisa can inspect them immediately):
-- `data/processed/complexity_expanded_results.json`: document measurements, means,
-  directional counts and paired bootstrap intervals.
-- `docs/expanded_comparison.md`: readable table of all measures and the failure.
-
-Intervals use 2,000 paired-document resamples within submission year (seed 47).
-The analysis is conditional on normal generation completion. It does not correct
-for author dependence, missing failed cases, semantic problems or testing many
-measures. Repetition/output-quality screening remains pending. Do not silently
-exclude additional outputs based on whether they support the desired result.
-The low-level comparison function still rejects failures by default; this entry
-point explicitly requests and labels a completed-case analysis.
-
-## Optional: run the local translator
-
-Not needed for Luisa to start analysing the existing data.
+The translations are saved in `data/processed/complexity_fr_author_translations.json`.
+To regenerate them (about 2 hours on an Apple M-series laptop):
 
 ```bash
 python -m pip install -r requirements-translation.txt
 mkdir -p models
+# download translategemma-4b-it-Q4_K_M.gguf from
+# https://huggingface.co/Menterium/translategemma-4b-it-GGUF into models/, then check:
+shasum -a 256 models/translategemma-4b-it-Q4_K_M.gguf
+# e7d9523174272fca61264b339f06d10c6115426267bb0f752b0124084e487b8e
 ```
 
-Obtain `translategemma-4b-it-Q4_K_M.gguf` from
-https://huggingface.co/Menterium/translategemma-4b-it-GGUF
-and place it in `models/`. Expected SHA256:
-`e7d9523174272fca61264b339f06d10c6115426267bb0f752b0124084e487b8e`.
-Check the model's licence and access conditions at its source. This ZIP does not
-redistribute weights. `llama-cpp-python` may require a platform-specific build;
-the recorded setup uses Apple Metal (`n_gpu_layers=-1`). Other hardware is not
-configured or tested here.
+Then follow `docs/french_sample_howto.md`. Model weights are not redistributed here;
+check the model's licence at its source.
 
-```bash
-python - <<'PYCODE'
-from pathlib import Path
-from scripts.translate_pilot import translate_pilot
+## Data
 
-translate_pilot(
-    Path("."),
-    input_name="complexity_expanded_pairs.json",
-    output_name="complexity_expanded_translations.json",
-)
-PYCODE
-```
+Motion texts and author information come from the open data service of the Swiss
+Parliament (Curia Vista, `https://ws.parlament.ch/odata.svc/`), retrieved in
+November 2026. We analyse the justification (`ReasonText`) of all motions
+(BusinessType 5) submitted 2000–2025.
 
-On the bundled completed attempt set this reports no unattempted documents.
-It deliberately does NOT retry the flagged failure automatically. It preserves
-successful and failed attempts separately and validates saved input/settings.
-Use a new, documented output for any changed translation method. Running
-`translate_pilot.py` directly uses an obsolete pilot default whose inputs are not
-bundled; always use the explicit call above for this study.
+## Limitations
 
-## Collaborate with Git
+- One small open-weight model; the federal administration more likely uses commercial
+  systems such as DeepL.
+- The original language of a motion is inferred from its author (a proxy).
+- Complexity measures are parser-based estimates, not reader tests.
+- Translation quality is assessed only through the terminology check and a screening
+  (automatic checks on all outputs, reading 20 randomly drawn texts).
+- Rising similarity to MT may partly reflect recent official translations in the
+  model's training data.
+- Before 2023 the API stores special characters (guillemets, dashes, *œ*) as plain
+  substitutes, so character-level comparisons use 2023–2025 only.
 
-This repository has no remote. To collaborate online, create an empty private
-repository in your chosen hosting account, then add its URL and push `main`.
-No account credentials are included in this ZIP. Set your own Git author name
-and email before making commits.
+## Licence
 
-```bash
-git switch -c luisa/historical-analysis
-# Make focused changes, then inspect them:
-git status
-git diff
-# Add only the intended files and commit your work.
-```
-
-Once a shared remote is configured, pull before starting and push your branch.
-Avoid editing the same script simultaneously. Keep the fixed inputs and saved
-translation outputs unchanged; save new analysis outputs under new names.
-
-## File integrity and scope
-
-`SHA256SUMS` records the packaged files before the initial Git commit; `.git`
-and `SHA256SUMS` itself are excluded. On macOS, verify with
-`shasum -a 256 -c SHA256SUMS`; on Linux use `sha256sum -c SHA256SUMS`.
-
-The package omits weights, virtual environments, caches, access tokens, abandoned
-sentiment/quality code and superseded data. The unabridged methods log retains
-historical references to those experiments; they are not required dependencies.
-No project licence has been chosen on your behalf. Public release and the course's
-open-source requirement still require an explicit licensing decision and respect
-for the source data/model terms.
+<!-- TODO: choose a licence before making the repository public, e.g. MIT for the code. -->
+Code: to be added. Parliamentary texts: Swiss Parliament open data, subject to its terms of use.
