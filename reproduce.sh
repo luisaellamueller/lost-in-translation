@@ -20,6 +20,7 @@ python scripts/prepare_french_sample.py --check
 echo "== 4. RQ1 complexity measures (spaCy) and Figure 2"
 python scripts/compare_expanded.py --french
 python scripts/report_rq1.py
+python scripts/author_robustness.py
 
 echo "== 5. RQ2 Swiss conventions, terminology (Table 1), screening"
 python scripts/swiss_conventions.py --french

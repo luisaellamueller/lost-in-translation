@@ -84,7 +84,7 @@ def main() -> None:
     print("\n".join(lines))
 
     # Figure 2
-    fig, ax = plt.subplots(figsize=(8, 3.6))
+    fig, ax = plt.subplots(figsize=(6.3, 2.6))  # printed at text width, so 1 pt = 1 pt
     for i, (label, group, diff, pct, plo, phi) in enumerate(reversed(rows)):
         c = COLOURS[group]
         ax.errorbar(pct, i, xerr=[[pct - plo], [phi - pct]], fmt="o", color=c, capsize=3, ms=6)
@@ -93,21 +93,21 @@ def main() -> None:
         unit = {"Words per sentence": " words", "Max. tree depth": " levels",
                 "Word frequency (Zipf)": " Zipf", "Readability index (LIX)": " points"}.get(label, "")
         txt = f"{d:+.2f}{unit} ({pct:+.1f}%)" if abs(d) >= 0.01 else f"{d:+.3f} ({pct:+.1f}%)"
-        ax.annotate(txt, (phi if pct >= 0 else plo, i), xytext=(5 if pct >= 0 else -5, 0),
-                    textcoords="offset points", va="center", ha="left" if pct >= 0 else "right",
-                    fontsize=7.5, color=c)
+        ax.annotate(txt, (phi, i), xytext=(5, 0), textcoords="offset points", va="center",
+                    ha="left", fontsize=8, color=c,
+                    bbox=dict(boxstyle="square,pad=0.1", fc="white", ec="none"))
     ax.set_yticks(range(len(rows)), [r[0] for r in reversed(rows)], fontsize=8.5)
     ax.axvline(0, color="#999999", lw=0.8)
-    ax.set_xlim(-14, 44)
+    ax.set_xlim(-12, 46)
     ax.set_xlabel("Machine minus official German (% of official mean), 95% CI", fontsize=8.5)
     for g, c in COLOURS.items():
         ax.plot([], [], "o-", color=c, label=g)
-    ax.legend(loc="lower right", fontsize=7.5, frameon=False)
+    ax.legend(loc="lower right", fontsize=8, frameon=False)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     fig.tight_layout()
     Path("docs/figures").mkdir(parents=True, exist_ok=True)
-    fig.savefig("docs/figures/paired_differences.png", dpi=200)
+    fig.savefig("docs/figures/paired_differences.png", dpi=300)
     print("Saved docs/figures/paired_differences.png")
 
 

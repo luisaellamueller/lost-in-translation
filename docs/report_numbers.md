@@ -18,6 +18,7 @@ data from the Parliament API). Only two inputs are not computed by code:
 | 3 Sample | 260 pairs, 10 per year, seed 48, 30 development texts excluded | `prepare_french_sample.py --check` | console (sample identical: True) |
 | 3 Translation | 259 completed, 1 failure (output limit) | `compare_expanded.py --french` | `docs/french_author_comparison.md` |
 | 4.1 RQ1, Figure 2 | +1.1 words, +0.28 levels, +15%, +27%, +0.12 Zipf (1.3x, 200 of 259), MATTR, LIX +1.8, periods, dependency distance and lexical density n.s. | `compare_expanded.py --french`, `report_rq1.py` | `results/rq1_complexity.md`, `docs/figures/paired_differences.png` |
+| 3 Analysis, 4.1 RQ1 | 102 authors, 60 with several texts; mixed model with author random intercepts and Bonferroni correction: all seven differences non-zero | `author_robustness.py` | `results/author_robustness.md` |
 | 4.2 RQ2 | ß in 193 texts; 10.000 34 vs 3; Swiss forms 32; quotation marks | `swiss_conventions.py --french` | `results/swiss_conventions_counts_french.md` |
 | 4.2 Table 1 | terminology counts; abbreviations 41 of 54 | `terminology_check.py` | `results/terminology_french.md`, `results/terminology_checked_french.csv`, `results/terminology_contexts_french.csv` |
 | 4.2 Screening | length ratios, flags, 10/5/5 reading sample | `screen_translations.py` | `results/screening_french.md` |
