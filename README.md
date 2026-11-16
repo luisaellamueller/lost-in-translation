@@ -126,7 +126,7 @@ Some files document earlier steps and are kept because later scripts reuse them:
 
 - **Klara Kolarova:** corpus retrieval and cleaning, complexity measures, historical
   analysis, first translation sample and translation pipeline.
-- **Luisa Müller:** French-authored sample and author-language inference, RQ2 and RQ3
+- **Luisa Müller:** Literature Research, French-authored sample and author-language inference, RQ2 and RQ3
   analyses (conventions, terminology, screening, similarity over time), reproducibility
   scripts, report.
 
