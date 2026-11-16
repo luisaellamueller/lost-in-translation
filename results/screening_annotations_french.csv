@@ -1,0 +1,29 @@
+check,document_id,judgement,note
+reading_sample,20133348,ok,
+reading_sample,20213158,ok,
+reading_sample,20233852,ok,
+reading_sample,20113806,ok,
+reading_sample,20214097,ok,
+reading_sample,20133239,ok,
+reading_sample,20183432,ok,
+reading_sample,20083928,ok,
+reading_sample,20223284,ok,
+reading_sample,20223224,ok,
+reading_sample,20244110,minor,broken relative clause in second sentence; meaning recoverable
+reading_sample,20254642,minor,concessive "Si" rendered as conditional "Wenn"
+reading_sample,20203069,minor,French abbreviations OFEV/CCE kept
+reading_sample,20253316,minor,first sentence ungrammatical; "à l'horizon 2030" -> "im Jahr 2030"
+reading_sample,20003094,minor,"pour seulement cinq jours d'exposition" omitted
+reading_sample,20003435,content,"145 milliards" -> "14,5 Milliarden"; "l'interdiction entre en vigueur" -> "Die Veröffentlichung erfolgt"
+reading_sample,20174092,content,"poursuites" -> "Klagen" (Swiss term: Betreibungen); "émoluments" -> "Honorare"
+reading_sample,20083138,content,"Valais" -> "Waals" (Wallis); sentence structure garbled
+reading_sample,20063383,content,parenthesis turned into a contradictory time clause ("als die Post ... 2006 bekannt gab")
+reading_sample,20073201,content,"postulat" -> "Petition"; "LPP" -> "Rentenversicherungssystem"
+repetition_flag,20154097,mirrors_source,the French names "Message 2015 sur les constructions" four times (slightly varied wording); the output repeats one rendering
+repetition_flag,20164070,mirrors_source,mercury thresholds and cadastre phrase repeated as in the French
+repetition_flag,20203335,mirrors_source,the French states the 1% tax on fortunes above 2 million twice (different wording); the output repeats one rendering
+repetition_flag,20013164,mirrors_source,"États du sud et de l'est de la Méditerranée" appears twice in the French
+repetition_flag,20023261,mirrors_source,"mesures ... pour permettre aux détenus" repeated as in the French
+repetition_flag,20083550,mirrors_source,list of colourings repeated as in the French
+repetition_flag,20163049,mirrors_source,"liste des mandats de gestion" passage repeated as in the French
+french_flag,20153944,not_untranslated,flag caused by an invented expansion of LIFD/LHID into French law names; no French passage

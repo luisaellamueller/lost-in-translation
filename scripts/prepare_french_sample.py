@@ -27,12 +27,14 @@ Outputs in data/processed/:
                                            translate_pilot() resumes from it
 
 Run from the repository root:
-    python scripts/prepare_french_sample.py
+    python scripts/prepare_french_sample.py           # draw the sample (refuses to overwrite)
+    python scripts/prepare_french_sample.py --check   # redraw in memory and compare with the saved sample
 """
 from __future__ import annotations
 
 import csv
 import json
+import argparse
 import random
 from pathlib import Path
 
@@ -44,7 +46,11 @@ TRANSLATIONS_OUT = PROC / "complexity_fr_author_translations.json"
 
 
 def main() -> None:
-    if PAIRS_OUT.exists() or TRANSLATIONS_OUT.exists():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--check", action="store_true",
+                    help="redraw the sample in memory and compare it with the saved one")
+    check = ap.parse_args().check
+    if not check and (PAIRS_OUT.exists() or TRANSLATIONS_OUT.exists()):
         raise SystemExit("Sample files already exist — not overwriting a fixed sample. "
                          "Delete them deliberately if you really want to redraw.")
 
@@ -72,6 +78,15 @@ def main() -> None:
         chosen = keep[:PER_YEAR] + rng.sample(rest, PER_YEAR - len(keep[:PER_YEAR]))
         selected += sorted(chosen, key=lambda r: int(r["document_id"]))
         reused += [int(r["document_id"]) for r in keep[:PER_YEAR]]
+
+    if check:
+        saved = [int(r["document_id"]) for r in json.loads(PAIRS_OUT.read_text(encoding="utf-8"))["records"]]
+        redrawn = [int(r["document_id"]) for r in selected]
+        print(f"Eligible French-authored pairs (development IDs excluded): {len(eligible)}")
+        print(f"Redrawn sample identical to {PAIRS_OUT}: {saved == redrawn} ({len(redrawn)} IDs)")
+        if saved != redrawn:
+            raise SystemExit(1)
+        return
 
     PAIRS_OUT.write_text(json.dumps({
         "selection": (f"{PER_YEAR} French-authored eligible pairs per submission year 2000-2025; "

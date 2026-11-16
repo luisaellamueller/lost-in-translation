@@ -1,0 +1,54 @@
+% ---------------------------------------------------------------------
+% Experimental design as TikZ (replaces figures/design.png).
+% Preamble needs:
+%   \usepackage{tikz}
+%   \usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
+% ---------------------------------------------------------------------
+\begin{figure}[t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  >={Stealth[length=2.2mm]},
+  every path/.style={draw=black!85, line width=0.6pt},
+  data/.style={rectangle, draw=black!85, fill=black!12, line width=0.6pt,
+               minimum width=2.1cm, minimum height=1.15cm, align=center},
+  proc/.style={circle, draw=black!85, fill=black!12, line width=0.6pt,
+               minimum size=2.0cm, align=center, inner sep=1pt},
+  decision/.style={diamond, draw=black!85, fill=black!12, line width=0.6pt,
+                   aspect=1.1, align=center, inner sep=1pt, font=\sffamily\scriptsize},
+  note/.style={font=\sffamily\scriptsize, align=center}
+]
+% nodes
+\node[data]                              (corpus)  {Curia Vista\\motions\\2000--2025};
+\node[decision, right=0.7cm of corpus]   (fr)      {French-\\speaking\\author?};
+\node[data, right=1.9cm of fr]           (orig)    {French\\original};
+\node[proc, right=0.8cm of orig]         (human)   {Human\\translation};
+\node[proc, below=1.2cm of human]        (machine) {Machine\\translation};
+\node[data, right=0.8cm of human]        (off)     {Official\\German};
+\node[data, right=0.8cm of machine]      (mt)      {Machine\\German};
+\node[proc, minimum size=1.7cm] at ($(off.east)!0.5!(mt.east)+(1.8cm,0)$) (cmp) {Compare};
+\node[data, below=1.55cm of corpus]      (unused)  {not used};
+
+% arrows
+\draw[->] (corpus) -- (fr);
+\draw[->] (fr) -- node[above, note]{Yes} node[below, note, yshift=-3pt]{260 sampled,\\10 per year} (orig);
+\draw[->] (fr.south) to[bend left=25] node[right, note, pos=0.45]{No} (unused.east);
+\draw[->] (orig) -- (human);
+\draw[->] (orig.south east) to[bend right=20] node[left, note, pos=0.55]{same text} (machine.west);
+\draw[->] (human) -- (off);
+\draw[->] (machine) -- (mt);
+\draw[->] (off.east) to[bend left=15] (cmp);
+\draw[->] (mt.east) to[bend right=15] (cmp);
+
+% labels
+\node[note, above=1pt of human]  {federal translation service};
+\node[note, below=1pt of machine]{TranslateGemma 4B};
+\node[note, below=0.15cm of cmp, xshift=0.45cm] {RQ1 complexity\\RQ2 conventions\\RQ3 similarity};
+\end{tikzpicture}%
+}
+\caption{Experimental design. The same French original is translated once by
+the federal translation service (official German) and once by the MT model;
+both German versions are then compared.}
+\label{fig:design}
+\end{figure}
