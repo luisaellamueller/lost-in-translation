@@ -71,6 +71,7 @@ It does not regenerate the machine translations (see below).
 | RQ1 exploratory | `compare_source_structure.py`, `compare_source_syntax.py` | French-source sentence-count matching and depth correlations; length-adjusted correlations and year-stratified paired bootstrap |
 | RQ2 | `swiss_conventions.py --french`, `terminology_check.py`, `screen_translations.py` | Swiss conventions, Table 1 (terminology), screening of the outputs |
 | RQ3 | `similarity_over_time.py`, `special_characters.py` | chrF/BLEU over time (Figure 3); *ß* and dashes, Table 2 |
+| RQ3 robustness | `check_similarity_confounding.py` | adjusts the chrF year trend for French mean sentence length, tree depth and log document length; author-cluster bootstrap |
 | Appendix | `score_historical_complexity.py`, `historical_summary.py` | complexity of all 10,581 official German texts, 2000–2025 |
 
 `score_historical_complexity.py` reparses all 10,581 texts (slow) and is not part of

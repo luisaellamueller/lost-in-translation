@@ -31,6 +31,7 @@ python scripts/screen_translations.py
 
 echo "== 6. RQ3 similarity over time (Figure 3) and special characters (Table 2)"
 python scripts/similarity_over_time.py
+python scripts/check_similarity_confounding.py
 python scripts/special_characters.py
 
 echo "== 7. Appendix A"

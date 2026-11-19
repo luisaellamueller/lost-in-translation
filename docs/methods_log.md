@@ -817,3 +817,17 @@ part of the original seven measures or their author/multiplicity correction.
 Dependency distance and relative-clause explorations remain in the output. Spot-checks exposed a missed
 French dont relative clause; automatic clause counts are not gold annotations.
 
+## 2026-11-19: French-source adjustment of the similarity trend
+
+Exploratory OLS analysis of the same 259 pairs, using year (per decade), French
+mean sentence length, mean dependency-tree depth, and log document word count.
+Controls are standardized; the year slope remains in chrF points per decade.
+The unadjusted and adjusted models share the sample and 2,000 author-cluster
+bootstrap draws (seed 50; all documents of each sampled author retained).
+This accounts for dependence among texts by the same author. It does not identify
+MT use or control for topics, translation guidelines or model training overlap.
+
+`check_similarity_confounding.py` runs after `similarity_over_time.py` in
+`reproduce.sh`. Outputs are `similarity_source_adjustment.json` and the Markdown
+summary of the same name. Within-language historical trends are retained as
+exploratory context, not a proposed separate main-report analysis.
