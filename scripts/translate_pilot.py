@@ -23,13 +23,20 @@ def translate_pilot(
             "input_over_limit") instead of stopping the run. Default False keeps
             the original behaviour.
     """
-    # Load the pilot and local translation model
-    data = json.loads((project_dir / "data/processed" / input_name).read_text(encoding="utf-8"))
+    data = json.loads(
+        (project_dir / "data/processed" / input_name).read_text(encoding="utf-8")
+    )
     model_path = project_dir / "models/translategemma-4b-it-Q4_K_M.gguf"
     output_path = project_dir / "data/processed" / output_name
     output = {
         "model_file": model_path.name,
-        "settings": {"temperature": 0.0, "max_tokens": 1800, "n_ctx": 4096, "seed": 42, "repeat_penalty": 1.0},
+        "settings": {
+            "temperature": 0.0,
+            "max_tokens": 1800,
+            "n_ctx": 4096,
+            "seed": 42,
+            "repeat_penalty": 1.0,
+        },
         "source_language": "fr",
         "target_language": "de",
         "records": [],
@@ -49,43 +56,85 @@ def translate_pilot(
                 raise ValueError(f"Input changed for {record['document_id']}.")
         for record in saved["records"]:
             if record["finish_reason"] != "stop" or not record["translation_de"]:
-                raise ValueError(f"Inspect incomplete document {record['document_id']} before resuming.")
+                raise ValueError(
+                    f"Inspect incomplete document {record['document_id']} before resuming."
+                )
         saved.setdefault("failed_records", [])
         output = saved
-    processed = {record["document_id"] for record in output["records"] + output["failed_records"]}
-    pending = [record for record in data["records"] if record["document_id"] not in processed]
+    processed = {
+        record["document_id"] for record in output["records"] + output["failed_records"]
+    }
+    pending = [
+        record for record in data["records"] if record["document_id"] not in processed
+    ]
     if not pending:
-        print(f"No unattempted documents: {len(output['records'])} completed, {len(output['failed_records'])} failed; inspect failures before evaluation.")
+        print(
+            f"No unattempted documents: {len(output['records'])} completed, {len(output['failed_records'])} failed; inspect failures before evaluation."
+        )
         return
-    model = Llama(model_path=str(model_path), n_ctx=4096, n_gpu_layers=-1, seed=42, verbose=False)
-    template = ImmutableSandboxedEnvironment().from_string(model.metadata["tokenizer.chat_template"])
+    model = Llama(
+        model_path=str(model_path), n_ctx=4096, n_gpu_layers=-1, seed=42, verbose=False
+    )
+    template = ImmutableSandboxedEnvironment().from_string(
+        model.metadata["tokenizer.chat_template"]
+    )
 
     # Render the model's own translation prompt for each full text
     for record in pending:
-        messages = [{"role": "user", "content": [{
-            "type": "text", "source_lang_code": "fr", "target_lang_code": "de", "text": record["input_fr"],
-        }]}]
-        prompt = template.render(messages=messages, bos_token="<bos>", add_generation_prompt=True)
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "source_lang_code": "fr",
+                        "target_lang_code": "de",
+                        "text": record["input_fr"],
+                    }
+                ],
+            }
+        ]
+        prompt = template.render(
+            messages=messages, bos_token="<bos>", add_generation_prompt=True
+        )
         tokens = model.tokenize(prompt.encode("utf-8"), add_bos=False, special=True)
         if len(tokens) > 2048:
             if not record_over_limit:
-                raise ValueError(f"Document {record['document_id']} exceeds the pilot's 2048-token input limit.")
+                raise ValueError(
+                    f"Document {record['document_id']} exceeds the pilot's 2048-token input limit."
+                )
             # Keep the fixed sample: record the document as a failure, never truncate or redraw
-            output["failed_records"].append({**record, "translation_de": "", "prompt": prompt,
-                                             "finish_reason": "input_over_limit",
-                                             "usage": {"prompt_tokens": len(tokens)}, "generation_seconds": 0.0})
+            output["failed_records"].append(
+                {
+                    **record,
+                    "translation_de": "",
+                    "prompt": prompt,
+                    "finish_reason": "input_over_limit",
+                    "usage": {"prompt_tokens": len(tokens)},
+                    "generation_seconds": 0.0,
+                }
+            )
             temporary_path = output_path.with_suffix(".tmp")
-            temporary_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            temporary_path.write_text(
+                json.dumps(output, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
             temporary_path.replace(output_path)
-            print(f"Flagged over input limit ({len(tokens)} tokens): {record['document_id']}", flush=True)
+            print(
+                f"Flagged over input limit ({len(tokens)} tokens): {record['document_id']}",
+                flush=True,
+            )
             continue
 
         # Generate without showing the model the German reference
         print(f"Translating {record['document_id']}...", flush=True)
         start = perf_counter()
         response = model.create_completion(
-            prompt=tokens, temperature=0.0, max_tokens=1800,
-            repeat_penalty=1.0, stop=["<end_of_turn>", "<eos>"],
+            prompt=tokens,
+            temperature=0.0,
+            max_tokens=1800,
+            repeat_penalty=1.0,
+            stop=["<end_of_turn>", "<eos>"],
         )
         choice = response["choices"][0]
         result = {
@@ -102,14 +151,17 @@ def translate_pilot(
 
         # Save every attempt and keep failed outputs separate for inspection
         temporary_path = output_path.with_suffix(".tmp")
-        temporary_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        temporary_path.write_text(
+            json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         temporary_path.replace(output_path)
         status = "Flagged incomplete" if failed else "Saved"
         print(f"{status}: {record['document_id']}", flush=True)
 
-    print(f"Finished attempts: {len(output['records'])} completed, {len(output['failed_records'])} failed. {output_path}")
+    print(
+        f"Finished attempts: {len(output['records'])} completed, {len(output['failed_records'])} failed. {output_path}"
+    )
 
 
 if __name__ == "__main__":
-    # Translate the development pilot
     translate_pilot(Path(__file__).resolve().parents[1])

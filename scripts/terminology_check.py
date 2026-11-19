@@ -22,6 +22,7 @@ Outputs: results/terminology_french.md         (Table 1 and the abbreviation cou
          results/terminology_checked_french.csv (one row per text and term)
          results/terminology_contexts_french.csv (French and German sentences, for inspection)
 """
+
 from __future__ import annotations
 
 import csv
@@ -35,22 +36,84 @@ OUT = Path("results")
 
 # term: (French pattern, Swiss German pattern, [(alternative label, pattern)], fallback label)
 TERMS = {
-    "motion": (r"\bmotions?\b", r"\bMotion\w*", [("Antrag", r"\bAntr(ag|äg)\w*")], "other"),
-    "interpellation": (r"\binterpellations?\b", r"\bInterpellation\w*", [("Anfrage", r"\bAnfrage\w*")], "lost"),
-    "postulat": (r"\bpostulats?\b", r"\bPostulat\w*",
-                 [("Petition", r"\bPetition\w*"), ("Punkt", r"\bPunkt\b"), ("Prämisse", r"\bPrämisse\b")], "other"),
-    "initiative parlementaire": (r"\binitiatives? parlementaires?\b", r"\bInitiative\w*", [], "other"),
-    "Conseil fédéral": (r"\bconseil f[ée]d[ée]ral\b", r"\bBundesrat\w*", [("Bundesregierung", r"\bBundesregierung\w*")], "other"),
+    "motion": (
+        r"\bmotions?\b",
+        r"\bMotion\w*",
+        [("Antrag", r"\bAntr(ag|äg)\w*")],
+        "other",
+    ),
+    "interpellation": (
+        r"\binterpellations?\b",
+        r"\bInterpellation\w*",
+        [("Anfrage", r"\bAnfrage\w*")],
+        "lost",
+    ),
+    "postulat": (
+        r"\bpostulats?\b",
+        r"\bPostulat\w*",
+        [
+            ("Petition", r"\bPetition\w*"),
+            ("Punkt", r"\bPunkt\b"),
+            ("Prämisse", r"\bPrämisse\b"),
+        ],
+        "other",
+    ),
+    "initiative parlementaire": (
+        r"\binitiatives? parlementaires?\b",
+        r"\bInitiative\w*",
+        [],
+        "other",
+    ),
+    "Conseil fédéral": (
+        r"\bconseil f[ée]d[ée]ral\b",
+        r"\bBundesrat\w*",
+        [("Bundesregierung", r"\bBundesregierung\w*")],
+        "other",
+    ),
     "Conseil national": (r"\bconseil national\b", r"\bNationalrat\w*", [], "other"),
-    "Conseil des Etats": (r"\bconseil des [ée]tats\b", r"\bStänderat\w*", [("Rat der Stände", r"\bRat der Stände\b")], "other"),
+    "Conseil des Etats": (
+        r"\bconseil des [ée]tats\b",
+        r"\bStänderat\w*",
+        [("Rat der Stände", r"\bRat der Stände\b")],
+        "other",
+    ),
 }
 # French abbreviation -> Swiss German abbreviation (unambiguous forms only)
 ABBREVIATIONS = {
-    "AVS": "AHV", "LAMal": "KVG", "LPP": "BVG", "LIFD": "DBG", "LHID": "StHG", "CFF": "SBB", "EPF": "ETH",
-    "OFSP": "BAG", "OFEV": "BAFU", "OFAS": "BSV", "LCR": "SVG", "DFAE": "EDA", "DDPS": "VBS", "DETEC": "UVEK",
-    "OFROU": "ASTRA", "LAA": "UVG", "APG": "EO", "OFEN": "BFE", "OFT": "BAV", "LPE": "USG", "LAT": "RPG",
-    "OFAG": "BLW", "AFC": "ESTV", "CDF": "EFK", "LAI": "IVG", "LAVS": "AHVG", "OFS": "BFS", "OFJ": "BJ",
-    "DFF": "EFD", "DFI": "EDI", "DEFR": "WBF", "DFJP": "EJPD", "CEDH": "EMRK", "LACI": "AVIG",
+    "AVS": "AHV",
+    "LAMal": "KVG",
+    "LPP": "BVG",
+    "LIFD": "DBG",
+    "LHID": "StHG",
+    "CFF": "SBB",
+    "EPF": "ETH",
+    "OFSP": "BAG",
+    "OFEV": "BAFU",
+    "OFAS": "BSV",
+    "LCR": "SVG",
+    "DFAE": "EDA",
+    "DDPS": "VBS",
+    "DETEC": "UVEK",
+    "OFROU": "ASTRA",
+    "LAA": "UVG",
+    "APG": "EO",
+    "OFEN": "BFE",
+    "OFT": "BAV",
+    "LPE": "USG",
+    "LAT": "RPG",
+    "OFAG": "BLW",
+    "AFC": "ESTV",
+    "CDF": "EFK",
+    "LAI": "IVG",
+    "LAVS": "AHVG",
+    "OFS": "BFS",
+    "OFJ": "BJ",
+    "DFF": "EFD",
+    "DFI": "EDI",
+    "DEFR": "WBF",
+    "DFJP": "EJPD",
+    "CEDH": "EMRK",
+    "LACI": "AVIG",
 }
 
 
@@ -65,7 +128,8 @@ def machine_rendering(term: str, german: str) -> str:
 def keeps_french_abbreviation(abbreviation: str, german: str) -> bool:
     """True if the French abbreviation appears in the German text and the Swiss German one does not."""
     return bool(re.search(rf"\b{abbreviation}\b", german)) and not re.search(
-        rf"\b{ABBREVIATIONS[abbreviation]}\b", german)
+        rf"\b{ABBREVIATIONS[abbreviation]}\b", german
+    )
 
 
 def sentences(text: str) -> list[str]:
@@ -75,9 +139,12 @@ def sentences(text: str) -> list[str]:
 def main() -> None:
     records = json.loads(TRANSLATIONS.read_text(encoding="utf-8"))["records"]
     rows, contexts = [], []
-    lines = ["# RQ2: parliamentary terminology (French-authored sample, 259 pairs)", "",
-             "| French source | Texts | Official keeps | Machine keeps | Machine instead (texts) |",
-             "|---|---:|---:|---:|---|"]
+    lines = [
+        "# RQ2: parliamentary terminology (French-authored sample, 259 pairs)",
+        "",
+        "| French source | Texts | Official keeps | Machine keeps | Machine instead (texts) |",
+        "|---|---:|---:|---:|---|",
+    ]
     for term, (fr_pat, de_pat, alternatives, fallback) in TERMS.items():
         docs = [r for r in records if re.search(fr_pat, r["input_fr"], re.I)]
         off_keep = mt_keep = 0
@@ -90,13 +157,38 @@ def main() -> None:
             mt_keep += mt
             if not mt:
                 instead[rendering] += 1
-            rows.append({"term": term, "document_id": r["document_id"], "official_keeps": int(off),
-                         "machine_keeps": int(mt), "machine_rendering": rendering})
-            contexts.append({"term": term, "document_id": r["document_id"],
-                             "french": " | ".join(s for s in sentences(r["input_fr"]) if re.search(fr_pat, s, re.I)),
-                             "official": " | ".join(s for s in sentences(r["reference_de"]) if re.search(de_pat, s)),
-                             "machine": r["translation_de"] if not mt else
-                             " | ".join(s for s in sentences(r["translation_de"]) if re.search(de_pat, s))})
+            rows.append(
+                {
+                    "term": term,
+                    "document_id": r["document_id"],
+                    "official_keeps": int(off),
+                    "machine_keeps": int(mt),
+                    "machine_rendering": rendering,
+                }
+            )
+            contexts.append(
+                {
+                    "term": term,
+                    "document_id": r["document_id"],
+                    "french": " | ".join(
+                        s
+                        for s in sentences(r["input_fr"])
+                        if re.search(fr_pat, s, re.I)
+                    ),
+                    "official": " | ".join(
+                        s for s in sentences(r["reference_de"]) if re.search(de_pat, s)
+                    ),
+                    "machine": (
+                        r["translation_de"]
+                        if not mt
+                        else " | ".join(
+                            s
+                            for s in sentences(r["translation_de"])
+                            if re.search(de_pat, s)
+                        )
+                    ),
+                }
+            )
         alt = ", ".join(f"{k} ({v})" for k, v in instead.most_common()) or "-"
         lines.append(f"| {term} | {len(docs)} | {off_keep} | {mt_keep} | {alt} |")
 
@@ -113,13 +205,25 @@ def main() -> None:
         mt_french += bool(mt_list)
         off_french += bool(off_list)
         examples.update(mt_list)
-    lines += ["", f"French abbreviations of Swiss authorities and laws: {with_abbr} texts contain one; "
-              f"the machine output keeps the French form in {mt_french}, the official translation in {off_french}.",
-              "Most frequent: " + ", ".join(f"{a}->{ABBREVIATIONS[a]} ({n})" for a, n in examples.most_common(8)) + "."]
+    lines += [
+        "",
+        f"French abbreviations of Swiss authorities and laws: {with_abbr} texts contain one; "
+        f"the machine output keeps the French form in {mt_french}, the official translation in {off_french}.",
+        "Most frequent: "
+        + ", ".join(
+            f"{a}->{ABBREVIATIONS[a]} ({n})" for a, n in examples.most_common(8)
+        )
+        + ".",
+    ]
 
     OUT.mkdir(exist_ok=True)
-    (OUT / "terminology_french.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    for name, data in (("terminology_checked_french.csv", rows), ("terminology_contexts_french.csv", contexts)):
+    (OUT / "terminology_french.md").write_text(
+        "\n".join(lines) + "\n", encoding="utf-8"
+    )
+    for name, data in (
+        ("terminology_checked_french.csv", rows),
+        ("terminology_contexts_french.csv", contexts),
+    ):
         with open(OUT / name, "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=list(data[0]))
             w.writeheader()

@@ -6,11 +6,13 @@ text-level covariation, not aligned construction preservation or causation.
 """
 
 import json
-from pathlib import Path
 import re
+from pathlib import Path
+
 import numpy as np
 import spacy
 from spacy.symbols import ORTH
+
 from compare_complexity import load_parser
 
 ROOT = Path(__file__).resolve().parents[1]

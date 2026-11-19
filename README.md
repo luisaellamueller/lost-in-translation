@@ -142,7 +142,7 @@ against the saved primary analysis. French and German dependency schemes differ;
 correlations describe document-level covariation, not aligned tree equivalence.
 The outputs include sentence counts, depth, dependency distance and relative
 clauses. Exploratory intervals are not corrected for repeated authors or multiple
-comparisons. Report edits are managed separately by the authors.
+comparisons.
 
 ## Development material (not used in the report)
 
@@ -167,7 +167,7 @@ Some files document earlier steps and are kept because later scripts reuse them:
 
 - **Klara Kolarova:** corpus retrieval and cleaning, complexity measures, historical
   analysis, first translation sample and translation pipeline.
-- **Luisa Müller:** Literature Research, French-authored sample and author-language inference, RQ2 and RQ3
+- **Luisa Müller:** literature research, French-authored sample and author-language inference, RQ2 and RQ3
   analyses (conventions, terminology, screening, similarity over time), reproducibility
   scripts, report.
 

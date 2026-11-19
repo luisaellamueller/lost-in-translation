@@ -1,4 +1,5 @@
 """Make the analysis scripts importable and run every test from the repository root."""
+
 import sys
 from pathlib import Path
 

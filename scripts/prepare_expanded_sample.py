@@ -12,7 +12,10 @@ def prepare_sample(project_dir: Path) -> None:
     # Exclude every document used to develop or inspect the earlier measures
     processed = project_dir / "data/processed"
     excluded_ids = set()
-    for filename in ("complexity_translations.json", "complexity_validation_translations.json"):
+    for filename in (
+        "complexity_translations.json",
+        "complexity_validation_translations.json",
+    ):
         pilot = json.loads((processed / filename).read_text(encoding="utf-8"))
         excluded_ids.update(row["document_id"] for row in pilot["records"])
     corpus = json.loads((processed / "motion_corpus.json").read_text(encoding="utf-8"))
@@ -24,12 +27,20 @@ def prepare_sample(project_dir: Path) -> None:
     selected = []
     for year in range(2000, 2026):
         eligible = sorted(
-            (row for row in corpus["records"] if row["year"] == year
-             and row["input_fr"] and row["document_id"] not in excluded_ids
-             and not row["exclusion_de"] and not row["exclusion_fr"]),
+            (
+                row
+                for row in corpus["records"]
+                if row["year"] == year
+                and row["input_fr"]
+                and row["document_id"] not in excluded_ids
+                and not row["exclusion_de"]
+                and not row["exclusion_fr"]
+            ),
             key=lambda row: row["document_id"],
         )
-        selected.extend(sorted(rng.sample(eligible, 10), key=lambda row: row["document_id"]))
+        selected.extend(
+            sorted(rng.sample(eligible, 10), key=lambda row: row["document_id"])
+        )
 
     # Preserve selection before token checks or additional translations
     output = {
@@ -41,10 +52,11 @@ def prepare_sample(project_dir: Path) -> None:
         "records": selected,
     }
     path = processed / "complexity_expanded_pairs.json"
-    path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"Saved {len(selected)} pairs to {path.name}")
 
 
 if __name__ == "__main__":
-    # Prepare the balanced translation sample
     prepare_sample(Path(__file__).resolve().parents[1])

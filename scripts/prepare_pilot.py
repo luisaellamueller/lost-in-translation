@@ -33,9 +33,16 @@ def prepare_pilot(project_dir: Path) -> list[dict[str, Any]]:
     Returns:
         Five records containing full submitted texts, titles, and provenance.
     """
-    # Load the existing snapshots
-    german = json.loads((project_dir / "data/raw/interpellations_2000_de.json").read_text(encoding="utf-8"))["d"]
-    french = json.loads((project_dir / "data/raw/interpellations_2000_fr.json").read_text(encoding="utf-8"))["d"]
+    german = json.loads(
+        (project_dir / "data/raw/interpellations_2000_de.json").read_text(
+            encoding="utf-8"
+        )
+    )["d"]
+    french = json.loads(
+        (project_dir / "data/raw/interpellations_2000_fr.json").read_text(
+            encoding="utf-8"
+        )
+    )["d"]
     german_by_id = {row["ID"]: row for row in german}
     french_by_id = {row["ID"]: row for row in french}
 
@@ -57,33 +64,41 @@ def prepare_pilot(project_dir: Path) -> list[dict[str, Any]]:
         fr = french_by_id[document_id]
         # Convert API milliseconds to a calendar date in UTC
         timestamp = int(de["SubmissionDate"][6:-2]) / 1000
-        submission_date = datetime.fromtimestamp(timestamp, timezone.utc).date().isoformat()
-        pairs.append({
-            "document_id": document_id,
-            "submission_date": submission_date,
-            "title_de": de["Title"].strip(),
-            "title_fr": fr["Title"].strip(),
-            "input_fr": clean_text(fr["SubmittedText"]),
-            "reference_de": clean_text(de["SubmittedText"]),
-            "record_url_fr": fr["__metadata"]["uri"],
-            "record_url_de": de["__metadata"]["uri"],
-        })
+        submission_date = (
+            datetime.fromtimestamp(timestamp, timezone.utc).date().isoformat()
+        )
+        pairs.append(
+            {
+                "document_id": document_id,
+                "submission_date": submission_date,
+                "title_de": de["Title"].strip(),
+                "title_fr": fr["Title"].strip(),
+                "input_fr": clean_text(fr["SubmittedText"]),
+                "reference_de": clean_text(de["SubmittedText"]),
+                "record_url_fr": fr["__metadata"]["uri"],
+                "record_url_de": de["__metadata"]["uri"],
+            }
+        )
     return pairs
 
 
 if __name__ == "__main__":
-    # Save the pilot with its selection rule and limitations
     project_dir = Path(__file__).resolve().parents[1]
     pairs = prepare_pilot(project_dir)
     output = {
         "purpose": "Development pilot; not the final evaluation sample.",
         "selection": "Five shared IDs sampled without replacement from sorted eligible IDs using random.Random(42); ordinary interpellations submitted in 2000 with nonempty DE and FR SubmittedText.",
-        "source_files": ["data/raw/interpellations_2000_de.json", "data/raw/interpellations_2000_fr.json"],
+        "source_files": [
+            "data/raw/interpellations_2000_de.json",
+            "data/raw/interpellations_2000_fr.json",
+        ],
         "provenance": "Curia Vista OData snapshots; exact queries and UTC retrieval times are saved in the source files.",
         "text_scope": "Full SubmittedText only; excludes ReasonText and government responses.",
         "source_language": "Unverified. French is the designated input; German is the official reference.",
         "records": pairs,
     }
     output_path = project_dir / "data/processed/pilot_pairs.json"
-    output_path.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_path.write_text(
+        json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"Saved {len(pairs)} pairs to {output_path.name}")

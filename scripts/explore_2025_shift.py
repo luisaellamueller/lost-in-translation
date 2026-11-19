@@ -14,6 +14,7 @@ alternative explanations. Run from the repository root:
 
     python scripts/explore_2025_shift.py
 """
+
 from __future__ import annotations
 
 import collections
@@ -78,13 +79,17 @@ def main() -> None:
     print(", ".join(markers), "\n")
     print(f"{'period':<10}{'docs':>6}{'per 1000 words':>17}{'docs with >=2':>16}")
     groups = [(str(y), [r for r in recs if r["year"] == y]) for y in range(2010, 2025)]
-    groups += [("2025 H1*", [r for r in recs if r["year"] == 2025 and half(r) == "H1"]),
-               ("2025 H2", [r for r in recs if r["year"] == 2025 and half(r) == "H2"])]
+    groups += [
+        ("2025 H1*", [r for r in recs if r["year"] == 2025 and half(r) == "H1"]),
+        ("2025 H2", [r for r in recs if r["year"] == 2025 and half(r) == "H2"]),
+    ]
     for name, g in groups:
         per1000, share = rate([r["reference_de"] for r in g], set(markers))
         print(f"{name:<10}{len(g):>6}{per1000:>17.2f}{share:>15.1f}%")
-    print("\n* discovery sample: its value is inflated by construction. "
-          "Compare 2025 H2 (held out) with earlier years.")
+    print(
+        "\n* discovery sample: its value is inflated by construction. "
+        "Compare 2025 H2 (held out) with earlier years."
+    )
 
 
 if __name__ == "__main__":
