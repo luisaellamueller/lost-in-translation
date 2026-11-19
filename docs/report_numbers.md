@@ -1,7 +1,7 @@
 # Where each number in the report comes from
 
 Every number, table and figure in the report is produced by a script in `scripts/`.
-`bash reproduce.sh` runs them all in order (add `--fetch` to re-download the author
+`bash reproduce.sh` reruns the analyses in order, using saved scores for the historical appendix (add `--fetch` to re-download the author
 data from the Parliament API). Only two inputs are not computed by code:
 
 * the machine translations (`data/processed/complexity_fr_author_translations.json`),
@@ -27,3 +27,14 @@ data from the Parliament API). Only two inputs are not computed by code:
 | 4.3 Table 2 | 259/193/37; 435/0/91; German/Italian row; 14 ß texts, members, Fisher p; dashes 37 vs 8; dashes per year | `special_characters.py` | `results/special_characters.md` |
 | Appendix A | 10,581 texts; 20.6 words; Zipf 4.02 to 4.07; 2025 vs 2024; 21% / 3% | `historical_summary.py` (scores from `score_historical_complexity.py`) | `results/historical_summary.md`, `docs/figures/historical_complexity.png` |
 | Figure 1 | study design (diagram, no numbers computed) | — | `docs/figures/design_tikz.tex` |
+
+## Additional source comparisons
+
+| Analysis | Script | Outputs |
+|---|---|---|
+| Sentence-count matching (64% machine, 33% official) | `compare_source_structure.py` | `results/source_structure_comparison.md`, `data/processed/source_structure_comparison.json` |
+| Source–target depth correlations, raw and sentence-length-adjusted | `compare_source_syntax.py` | `results/source_syntax_comparison.md`, `data/processed/source_syntax_comparison.json` |
+| chrF trend adjusted for French-source properties (+1.71 vs +1.63 points per decade) | `check_similarity_confounding.py` | `results/similarity_source_adjustment.md`, `data/processed/similarity_source_adjustment.json` |
+
+All three scripts run through `reproduce.sh`. The appendix figure is redrawn by
+`score_historical_complexity.py --plot-only` from the saved historical scores.

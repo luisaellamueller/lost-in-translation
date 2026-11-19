@@ -74,10 +74,12 @@ It does not regenerate the machine translations (see below).
 | RQ3 robustness | `check_similarity_confounding.py` | adjusts the chrF year trend for French mean sentence length, tree depth and log document length; author-cluster bootstrap |
 | Appendix | `score_historical_complexity.py`, `historical_summary.py` | complexity of all 10,581 official German texts, 2000–2025 |
 
-`score_historical_complexity.py` reparses all 10,581 texts (slow) and is not part of
-`reproduce.sh`; its saved output is `data/processed/historical_complexity.json.gz`. To
-redraw the appendix figure, unpack it first:
-`python -c "import gzip,shutil; shutil.copyfileobj(gzip.open('data/processed/historical_complexity.json.gz'), open('data/processed/historical_complexity.json','wb'))"`.
+The appendix uses saved scores for all 10,581 official German texts in
+`data/processed/historical_complexity.json.gz`. `reproduce.sh` recomputes the
+appendix summary and redraws its figure from these scores. To redraw only the
+figure, run `python scripts/score_historical_complexity.py --plot-only`.
+To reparse the full historical corpus (slow), run the same command without
+`--plot-only`. Newly computed uncompressed scores take precedence for plotting.
 
 ### Regenerating the machine translations (optional)
 

@@ -18,39 +18,50 @@ cantons. Committees and parliamentary groups are excluded. This is a proxy.
 excluded. The 63 French-authored motions already translated are reused, and
 197 are new. The script refuses to overwrite an existing sample.
 
-## Steps (from the repository root, with `.venv` activated)
+## Reproduce the analysis
 
-1. One-time setup for translation (see README, "Optional: run the local translator"):
-   ```bash
-   pip install -r requirements-translation.txt
-   mkdir -p models
-   # download translategemma-4b-it-Q4_K_M.gguf into models/, then check:
-   shasum -a 256 models/translategemma-4b-it-Q4_K_M.gguf
-   # must be e7d9523174272fca61264b339f06d10c6115426267bb0f752b0124084e487b8e
-   ```
-2. Translate the 197 new texts (resumes if interrupted; about 1–2 hours):
+From the repository root, with the analysis environment activated:
+
+```bash
+bash reproduce.sh
+```
+
+This uses the 259 saved translations and the recorded failed attempt. It does
+not load the translation model or generate new translations. The failed text
+(20003342) used 2,037 prompt tokens and reached the 1,800-token output limit
+(`finish_reason: length`); it did not exceed the input limit.
+
+## Generate a separate translation run (optional)
+
+1. Install `requirements-translation.txt` and download the model as described in
+   the README under "Regenerating the machine translations (optional)". Check
+   the model checksum before running it.
+2. Generate into a separate file to preserve the submitted results:
+
    ```bash
    python - <<'PYCODE'
    from pathlib import Path
    from scripts.translate_pilot import translate_pilot
-   translate_pilot(Path("."),
+   translate_pilot(
+       Path("."),
        input_name="complexity_fr_author_pairs.json",
-       output_name="complexity_fr_author_translations.json",
-       record_over_limit=True)
+       output_name="complexity_fr_author_translations_rerun.json",
+       record_over_limit=True,
+   )
    PYCODE
    ```
-   One text (20003342, about 8,900 characters) is expected to exceed the
-   2,048-token input limit. It is recorded as a failure (`input_over_limit`),
-   following the project rule: never truncate or redraw.
-3. Compare (same measures and bootstrap as the main analysis):
-   ```bash
-   python scripts/compare_expanded.py --french
-   ```
-   This writes `data/processed/complexity_fr_author_results.json` and `docs/french_author_comparison.md`.
-4. Swiss conventions and the terminology review sheet:
-   ```bash
-   python scripts/swiss_conventions.py --french
-   # annotate results/terminology_review_french.csv, then:
-   python scripts/swiss_conventions.py --french --summarise
-   ```
-5. Commit the new outputs. Never overwrite Klara's original files.
+
+   This attempts all 260 texts and resumes from the separate file if interrupted.
+   Using the original output filename instead would skip the already attempted
+   texts, including the recorded failure. Temperature and seed are fixed, but
+   results may differ across inference-library versions and hardware.
+3. Compare the rerun with the saved translations before deciding whether to use
+   it in the analysis. The main analysis continues to use the original file.
+
+## Optional terminology annotation
+
+`python scripts/swiss_conventions.py --french` regenerates the convention counts
+and creates a review sheet if none exists. Existing sheets are preserved.
+After annotating `results/terminology_review_french.csv`, run the same command
+with `--summarise`. The report's automatic terminology table is produced
+separately by `scripts/terminology_check.py`.

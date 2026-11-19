@@ -1,3 +1,5 @@
+import argparse
+import gzip
 import json
 from importlib.metadata import version
 from pathlib import Path
@@ -103,11 +105,12 @@ def plot_history(project_dir: Path) -> None:
         project_dir: Project directory containing completed historical scores.
     """
     # Show distinct dimensions without a composite complexity score
-    data = json.loads(
-        (project_dir / "data/processed/historical_complexity.json").read_text(
-            encoding="utf-8"
-        )
-    )
+    path = project_dir / "data/processed/historical_complexity.json"
+    if path.exists():
+        data = json.loads(path.read_text(encoding="utf-8"))
+    else:
+        with gzip.open(path.with_suffix(".json.gz"), "rt", encoding="utf-8") as f:
+            data = json.load(f)
     if data["completed_through"] != 2025:
         raise ValueError("Complete all historical years before plotting.")
     metrics = {
@@ -162,6 +165,16 @@ def plot_history(project_dir: Path) -> None:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Score or plot historical German complexity."
+    )
+    parser.add_argument(
+        "--plot-only",
+        action="store_true",
+        help="Redraw from saved scores without reparsing the corpus",
+    )
+    args = parser.parse_args()
     project_dir = Path(__file__).resolve().parents[1]
-    score_history(project_dir)
+    if not args.plot_only:
+        score_history(project_dir)
     plot_history(project_dir)
