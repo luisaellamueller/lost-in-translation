@@ -800,3 +800,24 @@ Prepared an isolated Git project and ZIP containing the six active/imported scri
 Added compare_expanded.py so Luisa can run the translation comparison directly. Explicit completed-case policy: analyse the 259 normally stopped outputs, report the one flagged length failure (20013159), preserve every original attempt, and state that normal completion is not semantic validation. Low-level scoring still rejects failures unless completed_cases_only=True. Entry point checks fixed input correspondence and complete unique attempt coverage. Uses unchanged shared complexity measures and adds 2,000 paired-document bootstrap resamples within submission year (seed 47), observed complete-pair counts retained. No multiple-testing correction, failure-selection correction or author clustering. Saves full JSON and a Markdown table; output-quality screening and period robustness remain pending.
 
 Verified the exact packaged comparison command executes from the repository root and reproduces the working-project JSON and Markdown results byte-for-byte. Verified all 259 IDs, failure accounting, metric-specific counts and paired means. Original translation file remains byte-identical. Dependency installation in a fresh environment is still not tested.
+
+
+## 2026-11-19: exploratory French-source structure comparison
+
+Added sentence-count comparison and source–target syntax correlations using the
+existing 259 completed triples; no translations were regenerated. French parsing
+uses fr_core_news_sm 3.8.0; German results are checked against the primary saved
+analysis. Sentence counts are repeated without forced line boundaries. Depth
+correlations are repeated after separate linear adjustment for mean sentence
+length in each language/version. Paired bootstrap samples preserve year strata
+and refit the adjustment on every draw (2,000 draws, fixed seeds).
+
+This was developed after inspecting the primary results. It is exploratory, not
+part of the original seven measures or their author/multiplicity correction.
+Dependency distance and relative-clause explorations remain in the output, while
+the report adds sentence-count and depth findings. Spot-checks exposed a missed
+French dont relative clause; automatic clause counts are not gold annotations.
+
+An editable report snapshot was extracted from the saved ZIP, with only the
+corresponding methods/results/limitations added. Exact additions are also in
+docs/source_structure_report_changes.md for newer Overleaf copies.

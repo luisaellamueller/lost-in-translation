@@ -19,7 +19,7 @@ the official German translation of the same text.
 | RQ2 | Does MT respect Swiss conventions and parliamentary terminology? | No. It writes *ß* in 193 of 259 texts (official: 0), uses German number and quotation formats, renders *Interpellation* as *Anfrage* (12 of 15) and *Motion* as *Antrag* (18 of 43), and keeps French abbreviations (*AVS* for *AHV*) in 41 of 54 texts. |
 | RQ3 | Have official translations become more similar to MT output over time? | Yes, since about 2015: chrF rises from 55.9 (2010–2014) to 61.4 (2023–2025). Surface errors of unrevised MT (*ß*) do not appear in official translations (0 of 435 in 2023–2025). |
 
-The full report is submitted separately as a PDF. `docs/report_numbers.md` lists, for
+An editable report snapshot is in `report/main.tex`; see `report/README.md` for its provenance. The final report is submitted separately as a PDF. `docs/report_numbers.md` lists, for
 every number in the report, the script and output file that produce it.
 
 ## Repository structure
@@ -68,6 +68,7 @@ It does not regenerate the machine translations (see below).
 | Sample | `prepare_french_sample.py` | 10 French-authored motions per year (260), seed 48; `--check` verifies the saved sample |
 | Translation | `translate_pilot.py` | TranslateGemma 4B, temperature 0, seed 42 (259 completed, 1 output-limit failure) |
 | RQ1 | `compare_expanded.py --french`, `report_rq1.py` | 18 complexity measures (spaCy `de_core_news_sm`, wordfreq), paired bootstrap; Figure 2 |
+| RQ1 exploratory | `compare_source_structure.py`, `compare_source_syntax.py` | French-source sentence-count matching and depth correlations; length-adjusted correlations and year-stratified paired bootstrap |
 | RQ2 | `swiss_conventions.py --french`, `terminology_check.py`, `screen_translations.py` | Swiss conventions, Table 1 (terminology), screening of the outputs |
 | RQ3 | `similarity_over_time.py`, `special_characters.py` | chrF/BLEU over time (Figure 3); *ß* and dashes, Table 2 |
 | Appendix | `score_historical_complexity.py`, `historical_summary.py` | complexity of all 10,581 official German texts, 2000–2025 |
@@ -121,6 +122,26 @@ python scripts/check_data.py
 python -m pytest -q
 bash reproduce.sh          # full pipeline including spaCy and chrF; ends with the tests
 ```
+
+## Exploratory source-structure analysis
+
+The two source-comparison scripts use the same 259 completed translations and the
+existing sentence-boundary conventions. French parsing adds `fr_core_news_sm` 3.8.0
+(in `requirements.txt`). Run both scripts after the existing German scoring:
+
+```bash
+python scripts/compare_source_structure.py
+python scripts/compare_source_syntax.py
+```
+
+Outputs are `data/processed/source_structure_comparison.json` and
+`source_syntax_comparison.json`, with readable summaries under `results/`.
+Both scripts also run through `reproduce.sh`. German measurements are checked
+against the saved primary analysis. French and German dependency schemes differ;
+correlations describe document-level covariation, not aligned tree equivalence.
+The relative-clause and dependency-distance explorations are retained in the
+outputs, but only sentence counts and depth are added to the report. Exploratory
+intervals are not corrected for repeated authors or multiple comparisons.
 
 ## Development material (not used in the report)
 

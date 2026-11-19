@@ -27,3 +27,12 @@ data from the Parliament API). Only two inputs are not computed by code:
 | 4.3 Table 2 | 259/193/37; 435/0/91; German/Italian row; 14 ß texts, members, Fisher p; dashes 37 vs 8; dashes per year | `special_characters.py` | `results/special_characters.md` |
 | Appendix A | 10,581 texts; 20.6 words; Zipf 4.02 to 4.07; 2025 vs 2024; 21% / 3% | `historical_summary.py` (scores from `score_historical_complexity.py`) | `results/historical_summary.md`, `docs/figures/historical_complexity.png` |
 | Figure 1 | study design (diagram, no numbers computed) | — | `docs/figures/design_tikz.tex` |
+
+## Exploratory source-structure comparison
+
+| Number | Script | Output |
+|---|---|---|
+| Sentence-count matches: model 166/259, official 86/259; punctuation-only 164/86 | `compare_source_structure.py` | `results/source_structure_comparison.md` |
+| Depth correlations: model .694, official .529; adjusted .435/.264; difference .171 [.039,.300] | `compare_source_syntax.py` | `results/source_syntax_comparison.md` |
+
+These additions use the same completed sample; all reported German primary measures are verified against saved results. The source analysis is exploratory, not part of the original seven-measure correction.
