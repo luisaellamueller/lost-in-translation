@@ -19,7 +19,7 @@ the official German translation of the same text.
 | RQ2 | Does MT respect Swiss conventions and parliamentary terminology? | No. It writes *ß* in 193 of 259 texts (official: 0), uses German number and quotation formats, renders *Interpellation* as *Anfrage* (12 of 15) and *Motion* as *Antrag* (18 of 43), and keeps French abbreviations (*AVS* for *AHV*) in 41 of 54 texts. |
 | RQ3 | Have official translations become more similar to MT output over time? | Yes, since about 2015: chrF rises from 55.9 (2010–2014) to 61.4 (2023–2025). Surface errors of unrevised MT (*ß*) do not appear in official translations (0 of 435 in 2023–2025). |
 
-An editable report snapshot is in `report/main.tex`; see `report/README.md` for its provenance. The final report is submitted separately as a PDF. `docs/report_numbers.md` lists, for
+The full report is submitted separately as a PDF. `docs/report_numbers.md` lists, for
 every number in the report, the script and output file that produce it.
 
 ## Repository structure
@@ -139,9 +139,9 @@ Outputs are `data/processed/source_structure_comparison.json` and
 Both scripts also run through `reproduce.sh`. German measurements are checked
 against the saved primary analysis. French and German dependency schemes differ;
 correlations describe document-level covariation, not aligned tree equivalence.
-The relative-clause and dependency-distance explorations are retained in the
-outputs, but only sentence counts and depth are added to the report. Exploratory
-intervals are not corrected for repeated authors or multiple comparisons.
+The outputs include sentence counts, depth, dependency distance and relative
+clauses. Exploratory intervals are not corrected for repeated authors or multiple
+comparisons. Report edits are managed separately by the authors.
 
 ## Development material (not used in the report)
 

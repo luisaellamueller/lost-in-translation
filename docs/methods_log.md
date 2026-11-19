@@ -814,10 +814,6 @@ and refit the adjustment on every draw (2,000 draws, fixed seeds).
 
 This was developed after inspecting the primary results. It is exploratory, not
 part of the original seven measures or their author/multiplicity correction.
-Dependency distance and relative-clause explorations remain in the output, while
-the report adds sentence-count and depth findings. Spot-checks exposed a missed
+Dependency distance and relative-clause explorations remain in the output. Spot-checks exposed a missed
 French dont relative clause; automatic clause counts are not gold annotations.
 
-An editable report snapshot was extracted from the saved ZIP, with only the
-corresponding methods/results/limitations added. Exact additions are also in
-docs/source_structure_report_changes.md for newer Overleaf copies.
