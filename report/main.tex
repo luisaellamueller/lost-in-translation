@@ -44,7 +44,7 @@
 Swiss federal law requires official texts in German, French and Italian, and
 machine translation (MT) is spreading in federal translation workflows. We ask
 what would change if Swiss parliamentary texts were translated by machine
-without revision, and whether more recent official translations resemble our model’s output more closely, potentially reflecting increased use of MT in translation workflows. We translated 260 motion justifications written by French-speaking members of
+without revision, and whether more recent official translations resemble our model's output more closely, potentially reflecting increased use of MT in translation workflows. We translated 260 motion justifications written by French-speaking members of
 parliament into German with an open-weight MT model and compared the output
 with the official German translations. The machine output does not uniformly simplify the texts: it uses more common words but longer sentences with deeper dependency structures. It also ignores Swiss writing conventions (\emph{\ss} in 193 of 259
 texts, none in the official versions) and frequently loses the legal names of
@@ -150,7 +150,7 @@ author language. By this proxy, 2,245 pairs were written by French speakers.
 
 \paragraph{Sample.} We drew ten French-authored pairs per submission year (260),
 at random with a fixed seed, excluding 30 documents used to develop the
-measures. This restriction reduces the risk of translating a French translation back into its original German, although the author’s inferred language is not a completely reliable proxy for the original language of each motion.
+measures. This restriction reduces the risk of translating a French translation back into its original German, although the author's inferred language is not a completely reliable proxy for the original language of each motion.
 
 \paragraph{Translation.} We translated the French texts with TranslateGemma~4B
 \citep{translategemma} (Q4\_K\_M, llama-cpp-python) using its own prompt template,
@@ -264,7 +264,7 @@ intervals of these two periods do not overlap. The linear trend is +1.6 chrF per
 decade (95\% interval +0.8 to +2.5), and BLEU rises from 17 to 24. The turning
 point coincides with the spread of neural MT. In line with post-editing research \citep{toral2019}, this is consistent with official
 translations increasingly being produced from MT output. It is, however, also
-what we would observe if the model had seen recent official translations during training; the two cannot be separated with our data, but texts published after the model’s release would help assess whether the pattern persists without direct overlap with its training data.
+what we would observe if the model had seen recent official translations during training; the two cannot be separated with our data, but texts published after the model's release would help assess whether the pattern persists without direct overlap with its training data.
 
 \begin{figure}[H]
 \centering
@@ -290,7 +290,7 @@ they were most likely written in German rather than translated. If \emph{\ss}
 were spread independently of the original language, the chance that no
 translation contained it would be below 1\% (one-sided Fisher's exact test, $p = 0.008$). Dashes, which our
 model inserts more often than official translators (37 vs.\ 8 of 259 texts),
-rose in 2023--2025 in translated and untranslated texts alike. Overall, the surface errors frequent in our model’s output are largely absent from official translations, suggesting professional revision or other quality-control practices.
+rose in 2023--2025 in translated and untranslated texts alike. Overall, the surface errors frequent in our model's output are largely absent from official translations, suggesting professional revision or other quality-control practices.
 \begin{table}[H]
 \centering
 \small
@@ -318,7 +318,7 @@ First, unrevised MT changes the complexity profile of parliamentary texts: more 
 % ======================================================================
 \section{Conclusion}
 
-Our model’s unrevised translations show systematic differences from the official German versions: more common vocabulary alongside longer sentences and deeper dependency structures, departures from Swiss writing conventions, and errors in institutional terminology. The terminology errors and departures from Swiss conventions identified in our model’s output highlight the importance of targeted revision before publication. Future work should add commercial MT systems and reader studies.
+Our model's unrevised translations show systematic differences from the official German versions: more common vocabulary alongside longer sentences and deeper dependency structures, departures from Swiss writing conventions, and errors in institutional terminology. The terminology errors and departures from Swiss conventions identified in our model's output highlight the importance of targeted revision before publication. Future work should add commercial MT systems and reader studies.
 
 % ======================================================================
 
