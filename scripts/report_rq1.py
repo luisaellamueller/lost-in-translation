@@ -83,32 +83,40 @@ def main() -> None:
     Path("results/rq1_complexity.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
 
-    # Figure 2
-    fig, ax = plt.subplots(figsize=(6.3, 2.6))  # printed at text width, so 1 pt = 1 pt
-    for i, (label, group, diff, pct, plo, phi) in enumerate(reversed(rows)):
+    # Separate the logarithmic Zipf score from relative changes in other measures.
+    fig, (ax, az) = plt.subplots(2, 1, figsize=(6.8, 4.0),
+                                gridspec_kw={"height_ratios": [5, 1.2]})
+    plotted = [r for r in reversed(rows) if r[0] != "Word frequency (Zipf)"]
+    for i, (label, group, diff, pct, plo, phi) in enumerate(plotted):
         c = COLOURS[group]
-        ax.errorbar(pct, i, xerr=[[pct - plo], [phi - pct]], fmt="o", color=c, capsize=3, ms=6)
-        raw = next(r for r in MEASURES if r[1] == label)
-        d = mean(x for x, _ in diffs(raw[0]))
-        unit = {"Words per sentence": " words", "Max. tree depth": " levels",
-                "Word frequency (Zipf)": " Zipf", "Readability index (LIX)": " points"}.get(label, "")
-        txt = f"{d:+.2f}{unit} ({pct:+.1f}%)" if abs(d) >= 0.01 else f"{d:+.3f} ({pct:+.1f}%)"
-        ax.annotate(txt, (phi, i), xytext=(5, 0), textcoords="offset points", va="center",
-                    ha="left", fontsize=8, color=c,
-                    bbox=dict(boxstyle="square,pad=0.1", fc="white", ec="none"))
-    ax.set_yticks(range(len(rows)), [r[0] for r in reversed(rows)], fontsize=8.5)
-    ax.axvline(0, color="#999999", lw=0.8)
-    ax.set_xlim(-12, 46)
-    ax.set_xlabel("Machine minus official German (% of official mean), 95% CI", fontsize=8.5)
-    for g, c in COLOURS.items():
-        ax.plot([], [], "o-", color=c, label=g)
-    ax.legend(loc="lower right", fontsize=8, frameon=False)
-    for s in ("top", "right"):
-        ax.spines[s].set_visible(False)
+        ax.errorbar(pct, i, xerr=[[pct - plo], [phi - pct]], fmt="o",
+                    color=c, capsize=3, ms=5)
+        ax.annotate(f"{diff:+.3f} ({pct:+.1f}%)", (phi, i), xytext=(5, 0),
+                    textcoords="offset points", va="center", fontsize=8)
+    ax.set_yticks(range(len(plotted)), [r[0] for r in plotted], fontsize=8)
+    ax.set_xlim(-12, 54)
+    ax.set_xlabel("Difference (% of official mean), 95% CI", fontsize=8)
+    summary = res["summary"]["mean_content_word_zipf"]
+    delta = summary["mean_difference"]
+    low, high = summary["paired_bootstrap_ci95"]
+    az.errorbar(delta, 0, xerr=[[delta - low], [high - delta]], fmt="o",
+                color=COLOURS["Vocabulary"], capsize=3, ms=5)
+    az.annotate(f"{delta:+.3f} Zipf", (high, 0), xytext=(5, 0),
+                textcoords="offset points", va="center", fontsize=8)
+    az.set_yticks([0], ["Word frequency (Zipf)"], fontsize=8)
+    az.set_xlim(-0.02, 0.21)
+    az.set_ylim(-0.6, 0.6)
+    az.set_xlabel("Difference (Zipf points), 95% CI", fontsize=8)
+    for axis in (ax, az):
+        axis.axvline(0, color="#999999", lw=0.8)
+        axis.tick_params(axis="x", labelsize=8)
+        for spine in ("top", "right"):
+            axis.spines[spine].set_visible(False)
+    fig.suptitle("Generated minus official German", fontsize=10)
     fig.tight_layout()
     Path("docs/figures").mkdir(parents=True, exist_ok=True)
-    fig.savefig("docs/figures/paired_differences.png", dpi=300)
-    print("Saved docs/figures/paired_differences.png")
+    fig.savefig("docs/figures/paired_differences_zipf_units.png", dpi=300)
+    print("Saved docs/figures/paired_differences_zipf_units.png")
 
 
 if __name__ == "__main__":
